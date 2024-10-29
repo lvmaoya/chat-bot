@@ -1,20 +1,22 @@
-import { DisplayOptions} from "@nlux/react";
+import { DisplayOptions } from "@nlux/react";
 import { ChatItem } from "@nlux/react";
 import merge from 'lodash/merge';
 
 const displayOptions: DisplayOptions = {
   height: 580,
-  width: 450,
+  width: 440,
   colorScheme: "light",
 };
 
-const onMessageReceived = function () {
+const onMessageReceived = function (e:any) {
   const textarea = document.querySelector('.nlux-comp-composer textarea') as HTMLTextAreaElement;
   if (textarea) {
     textarea.focus();
   } else {
     console.error('Can not find textarea element!');
   }
+  console.log(e.message.join(""));
+  
 }
 
 export const initialConversations: ChatItem<string>[] = [

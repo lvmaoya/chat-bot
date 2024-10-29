@@ -1,16 +1,14 @@
 import React, { useRef, useState } from 'react';
 import Chatbot, { ChatbotInterface } from './Chatbot';
-import { getChatOptions } from '../config/chatOptions';
 import styles from './ChatbotContainer.module.css';
 import { closeIcon, refreshIcon, bubbleTipIcon } from './icon/svgIcons';
 
 const ChatbotContainer: React.FC = () => {
-  const options = getChatOptions()
 
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(window.CHATBOT_CONFIG.displayByDefault || false);
   const chatRef = useRef(null);
 
-  const toggleChatBox = () => {    
+  const toggleChatBox = () => {
     setIsChatBoxVisible(!isChatBoxVisible);
   };
 
@@ -26,7 +24,7 @@ const ChatbotContainer: React.FC = () => {
         className={'webchat-bubble-tip ' + styles.bubbleTip}
         onClick={toggleChatBox}
       >
-         {bubbleTipIcon}
+        {bubbleTipIcon}
       </div>
 
       {/* 聊天框容器 */}
