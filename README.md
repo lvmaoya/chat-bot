@@ -1,5 +1,5 @@
 # 在网站中添加一个大模型 AI 助手 - 前端组件代码
-此项目是阿里云教程文档 [10分钟在网站上增加一个 AI 助手](https://help.aliyun.com/zh/model-studio/developer-reference/add-an-ai-assistant-to-your-website-in-10-minutes) 中的 AI 助手前端组件代码。
+此项目是基于阿里云教程文档 [10分钟在网站上增加一个 AI 助手](https://help.aliyun.com/zh/model-studio/developer-reference/add-an-ai-assistant-to-your-website-in-10-minutes) 中的 AI 助手前端组件代码。
 
 
 ## 如何运行
