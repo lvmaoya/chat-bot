@@ -1,30 +1,60 @@
-import { DisplayOptions } from "@nlux/react";
+import { DisplayOptions, MessageReceivedEventDetails, MessageSentEventDetails } from "@nlux/react";
 import { ChatItem } from "@nlux/react";
 import merge from 'lodash/merge';
 
+const MAX_STORAGE_SIZE = 80; // max conversation length
+const MAX_TIME_INTERVAL = 3 * 60 * 60 * 1000; // Up to 3 hours
 const displayOptions: DisplayOptions = {
   height: 580,
   width: 440,
   colorScheme: "light",
 };
 
-const onMessageReceived = function (e:any) {
+export let history = JSON.parse(localStorage.getItem('history') || '[]');
+let lastConversationTime = localStorage.getItem('lastConversationTime');
+
+const checkLastConversationTime = function () {
+  const currentTime = new Date().getTime();
+  if (lastConversationTime && (currentTime - parseInt(lastConversationTime, 10) > MAX_TIME_INTERVAL)) {
+    localStorage.removeItem('history');
+    history = [];
+  }
+}
+
+checkLastConversationTime();
+
+const onMessageReceived = function (e: MessageReceivedEventDetails<any>) {
   const textarea = document.querySelector('.nlux-comp-composer textarea') as HTMLTextAreaElement;
   if (textarea) {
     textarea.focus();
   } else {
     console.error('Can not find textarea element!');
   }
-  console.log(e.message.join(""));
-  
+  const receivedMsg = e.message.join("");
+  history.push({
+    role: 'assistant',
+    message: receivedMsg
+  });
+  if (history.length > MAX_STORAGE_SIZE) {
+    history = history.slice(-30);
+  }
+  localStorage.setItem('history', JSON.stringify(history));
+  localStorage.setItem('lastConversationTime', new Date().getTime().toString());
+}
+const onMessageSent = function (event: MessageSentEventDetails) {
+  history.push({
+    role: 'user',
+    message: event.message
+  });
+  if (history.length > MAX_STORAGE_SIZE) {
+    history = history.slice(-30);
+  }
+  localStorage.setItem('history', JSON.stringify(history));
+  localStorage.setItem('lastConversationTime', new Date().getTime().toString());
 }
 
-export const initialConversations: ChatItem<string>[] = [
-  {
-    role: 'assistant',
-    message: 'Hi there! I am CEEG’s assistant. What information are you looking for?',
-  }
-];
+
+export let initialConversations = (history.length == 0 ? null : [...history]) as ChatItem<string>[];
 
 export const defaultOptions = {
   personaOptions: {
@@ -43,8 +73,8 @@ export const defaultOptions = {
     placeholder: 'Please enter your questions',
     hideStopButton: true
   },
-
-  events: { messageReceived: onMessageReceived }
+  initialConversation: initialConversations,
+  events: { messageReceived: onMessageReceived, messageSent: onMessageSent }
 };
 
 export const getChatOptions = () => {

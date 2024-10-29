@@ -34,7 +34,6 @@ const App = forwardRef((_, ref) => {
 
   return (
     <>
-      {/* <AiChat api={api} adapter={adapter} {...options}  initialConversation={initialConversations}> */}
       <AiChat api={api} adapter={adapter} {...options}>
       </AiChat>
       {isButtonVisible && <div className={styles.stopButton}>

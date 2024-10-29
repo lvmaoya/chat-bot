@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import Chatbot, { ChatbotInterface } from './Chatbot';
 import styles from './ChatbotContainer.module.css';
 import { closeIcon, refreshIcon, bubbleTipIcon } from './icon/svgIcons';
-
+import { history,initialConversations } from "../config/chatOptions"
 const ChatbotContainer: React.FC = () => {
 
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(window.CHATBOT_CONFIG.displayByDefault || false);
@@ -15,6 +15,11 @@ const ChatbotContainer: React.FC = () => {
   const onClickRefresh = () => {
     (chatRef.current as unknown as ChatbotInterface).resetConversation();
     sessionStorage.removeItem('chatSessionId');
+    localStorage.removeItem('history');
+    localStorage.removeItem('lastConversationTime');
+    history.length = 0;
+    // @ts-ignore
+    initialConversations.length = 0;
   };
 
   return (
