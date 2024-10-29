@@ -38,10 +38,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  border: 1px solid #fff;
+  border: none;
   cursor: pointer;
   background-color: #eb9402;
   transition: all 0.3s;
+  z-index: 999999;
 }
 
 .bubbleTip:hover{
@@ -63,6 +64,7 @@
   opacity: 0.3;
   transform: translateY(120%);
   transition: all .3s;
+  z-index: 9999999;
 }
 
 .toolbar {
@@ -93,6 +95,7 @@
 
 .webchatLogoContainer{
   flex: 1;
+  padding-left: 4px;
 }
 .webchatLogoContainer img {
   width: 170px;

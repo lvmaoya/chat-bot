@@ -73,6 +73,9 @@
 .nlux-comp-composer>textarea:placeholder {
   color: #eee;
 }
+.nlux-comp-chatItem{
+  margin-bottom: 1em;
+}
 
 .nlux-comp-chatItem.nlux-comp-chatItem--bubblesLayout.nlux-comp-chatItem--sent>.nlux-comp-message {
   border-radius: 8px 0 8px 8px;
