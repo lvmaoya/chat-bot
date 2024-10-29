@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import Chatbot, { ChatbotInterface } from './Chatbot';
 import styles from './ChatbotContainer.module.css';
 import { closeIcon, refreshIcon, bubbleTipIcon } from './icon/svgIcons';
-import { history,initialConversations } from "../config/chatOptions"
+import { history, initialConversations } from "../config/chatOptions"
 const ChatbotContainer: React.FC = () => {
 
   const [isChatBoxVisible, setIsChatBoxVisible] = useState(window.CHATBOT_CONFIG.displayByDefault || false);
@@ -19,7 +19,9 @@ const ChatbotContainer: React.FC = () => {
     localStorage.removeItem('lastConversationTime');
     history.length = 0;
     // @ts-ignore
-    initialConversations.length = 0;
+    if (initialConversations != null) {
+      initialConversations.length = 0;
+    }
   };
 
   return (

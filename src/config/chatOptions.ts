@@ -3,9 +3,10 @@ import { ChatItem } from "@nlux/react";
 import merge from 'lodash/merge';
 
 const MAX_STORAGE_SIZE = 80; // max conversation length
+const KEEP_STORAGE_SIZE = 30; // max conversation length
 const MAX_TIME_INTERVAL = 3 * 60 * 60 * 1000; // Up to 3 hours
 const displayOptions: DisplayOptions = {
-  height: 580,
+  height: 630,
   width: 440,
   colorScheme: "light",
 };
@@ -36,7 +37,7 @@ const onMessageReceived = function (e: MessageReceivedEventDetails<any>) {
     message: receivedMsg
   });
   if (history.length > MAX_STORAGE_SIZE) {
-    history = history.slice(-30);
+    history = history.slice(-KEEP_STORAGE_SIZE);
   }
   localStorage.setItem('history', JSON.stringify(history));
   localStorage.setItem('lastConversationTime', new Date().getTime().toString());
@@ -47,7 +48,7 @@ const onMessageSent = function (event: MessageSentEventDetails) {
     message: event.message
   });
   if (history.length > MAX_STORAGE_SIZE) {
-    history = history.slice(-30);
+    history = history.slice(-KEEP_STORAGE_SIZE);
   }
   localStorage.setItem('history', JSON.stringify(history));
   localStorage.setItem('lastConversationTime', new Date().getTime().toString());

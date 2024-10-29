@@ -3,7 +3,7 @@
   --nlux-prmInp--ftFm: 16px;
   --nlux-chItm--algnItms: start;
   --nlux-hmMsg--bgClr: transparent;
-  --nlux-aiMsg--bgClr: #f6f6f6;
+  --nlux-aiMsg--bgClr: #f4f4f4;
 }
 .nlux-AiChat-root.nlux-theme-nova {
   --nlux-PromptInput--FontSize: 14px;
@@ -37,7 +37,7 @@
 }
 .nlux-conversationStarters-container>.nlux-comp-conversationStarters {
   display: block;
-  background-color: #f6f6f6;
+  background-color: #f4f4f4;
   border-radius: 8px;
   padding-top: 20px;
   padding-bottom: 10px;
@@ -76,13 +76,13 @@
 
 .nlux-comp-chatItem.nlux-comp-chatItem--bubblesLayout.nlux-comp-chatItem--sent>.nlux-comp-message {
   border-radius: 8px 0 8px 8px;
-  background: #f6f6f6;
-  color: #111;
+  background: #f4f4f4;
+  color: #171a20;
 }
 
 .nlux-comp-chatItem.nlux-comp-chatItem--bubblesLayout.nlux-comp-chatItem--received>.nlux-comp-message {
   border-radius: 0 8px 8px 8px;
-  color: #111;
+  color: #171a20;
 }
 
 .nlux-conversation-container img {
