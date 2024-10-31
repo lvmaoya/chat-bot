@@ -1,6 +1,7 @@
 import { DisplayOptions, MessageReceivedEventDetails, MessageSentEventDetails } from "@nlux/react";
 import { ChatItem } from "@nlux/react";
 import merge from 'lodash/merge';
+import { HISTORY, LAST_CONVERSATION_TIME } from "./cacheKey";
 
 const MAX_STORAGE_SIZE = 80; // max conversation length
 const KEEP_STORAGE_SIZE = 30; // max conversation length
@@ -11,13 +12,13 @@ const displayOptions: DisplayOptions = {
   colorScheme: "light",
 };
 
-export let history = JSON.parse(localStorage.getItem('history') || '[]');
-let lastConversationTime = localStorage.getItem('lastConversationTime');
+export let history = JSON.parse(localStorage.getItem(HISTORY) || '[]');
+let lastConversationTime = localStorage.getItem(LAST_CONVERSATION_TIME);
 
 const checkLastConversationTime = function () {
   const currentTime = new Date().getTime();
   if (lastConversationTime && (currentTime - parseInt(lastConversationTime, 10) > MAX_TIME_INTERVAL)) {
-    localStorage.removeItem('history');
+    localStorage.removeItem(HISTORY);
     history = [];
   }
 }
@@ -39,8 +40,8 @@ const onMessageReceived = function (e: MessageReceivedEventDetails<any>) {
   if (history.length > MAX_STORAGE_SIZE) {
     history = history.slice(-KEEP_STORAGE_SIZE);
   }
-  localStorage.setItem('history', JSON.stringify(history));
-  localStorage.setItem('lastConversationTime', new Date().getTime().toString());
+  localStorage.setItem(HISTORY, JSON.stringify(history));
+  localStorage.setItem(LAST_CONVERSATION_TIME, new Date().getTime().toString());
 }
 const onMessageSent = function (event: MessageSentEventDetails) {
   history.push({
@@ -50,8 +51,8 @@ const onMessageSent = function (event: MessageSentEventDetails) {
   if (history.length > MAX_STORAGE_SIZE) {
     history = history.slice(-KEEP_STORAGE_SIZE);
   }
-  localStorage.setItem('history', JSON.stringify(history));
-  localStorage.setItem('lastConversationTime', new Date().getTime().toString());
+  localStorage.setItem(HISTORY, JSON.stringify(history));
+  localStorage.setItem(LAST_CONVERSATION_TIME, new Date().getTime().toString());
 }
 
 

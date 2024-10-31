@@ -1,6 +1,7 @@
 import { StreamSend, StreamingAdapterObserver } from '@nlux/react';
 import { SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { USER_ID } from '../config/cacheKey';
 
 // sessionStorage.removeItem('chatSessionId');
 type StopFunction = () => void;
@@ -22,9 +23,11 @@ function defaultProcessChunk(chunks: string) {
     return [result, sessionId];
 }
 export const createSend = function (setStopFunctionVisible: { (value: SetStateAction<boolean>): void }): [StreamSend, StopFunction] {
+
     const stopGenerating: StopFunction = () => {
         reader && reader.cancel();
     };
+
 
     return [async (
         prompt: string,
@@ -34,11 +37,16 @@ export const createSend = function (setStopFunctionVisible: { (value: SetStateAc
         if (window.CHATBOT_CONFIG.dataProcessor?.rewritePrompt) {
             prompt = window.CHATBOT_CONFIG.dataProcessor.rewritePrompt(prompt);
         }
+        let userId = localStorage.getItem(USER_ID);
+        if (!userId) {
+            userId = uuidv4();
+            localStorage.setItem(USER_ID, userId);
+        }
         const body = {
             sessionId: sessionStorage.getItem('chatSessionId'),
             prompt,
             referer: window.location.href,
-            userId: uuidv4()
+            userId
         };
         const response = await fetch(window.CHATBOT_CONFIG.endpoint, {
             method: 'POST',
