@@ -63,7 +63,9 @@
   font-size: 16px;
   color: #eb9402;
 }
-
+.nlux-comp-chatItem--sent>.nlux-comp-chatItem-participantInfo{
+  display: none;
+}
 .nlux-AiChat-root>.nlux-chatRoom-container>.nlux-composer-container {
   border-top: 1px solid #eee;
 }
@@ -73,18 +75,20 @@
   color: #eee;
 }
 .nlux-comp-chatItem{
-  margin-bottom: 1em;
+  margin-bottom: 1.5em;
 }
 
 .nlux-comp-chatItem.nlux-comp-chatItem--bubblesLayout.nlux-comp-chatItem--sent>.nlux-comp-message {
   border-radius: 8px 0 8px 8px;
   background: #f4f4f4;
   color: #171a20;
+  line-height: 24px;
 }
 
 .nlux-comp-chatItem.nlux-comp-chatItem--bubblesLayout.nlux-comp-chatItem--received>.nlux-comp-message {
   border-radius: 0 8px 8px 8px;
   color: #171a20;
+  line-height: 24px;
 }
 
 .nlux-conversation-container img {

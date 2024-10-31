@@ -26,6 +26,8 @@ const checkLastConversationTime = function () {
 checkLastConversationTime();
 
 const onMessageReceived = function (e: MessageReceivedEventDetails<any>) {
+  console.log("onMessageReceived-----------------------------------------");
+  
   const textarea = document.querySelector('.nlux-comp-composer textarea') as HTMLTextAreaElement;
   if (textarea) {
     textarea.focus();

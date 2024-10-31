@@ -3,15 +3,26 @@ import { SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { USER_ID } from '../config/cacheKey';
 
-// sessionStorage.removeItem('chatSessionId');
 type StopFunction = () => void;
 let reader: ReadableStreamDefaultReader<Uint8Array>;
 
 function defaultProcessChunk(chunks: string) {
+    console.log("chunks-------" + chunks);
+
     let result = '';
-    let sessionId = null;
+    let sessionId = '';
     chunks.split("\nid").forEach(chunk => {
         let data: any = chunk.split('HTTP_STATUS/200\ndata:')[1];
+        if (data === undefined) {
+            let str = chunks.match(/"text": "(.*?)"/);
+            if (!str) {
+                str = [''];
+            } else {
+                str = [str[1]];
+            }
+            return [str[0] ?? result, sessionId];
+        }
+        
         try {
             data = JSON.parse(data);
             sessionId = data.output.session_id;
@@ -33,7 +44,6 @@ export const createSend = function (setStopFunctionVisible: { (value: SetStateAc
         prompt: string,
         observer: StreamingAdapterObserver,
     ) => {
-        // 插件扩展点 - 在发送请求前重写 prompt。
         if (window.CHATBOT_CONFIG.dataProcessor?.rewritePrompt) {
             prompt = window.CHATBOT_CONFIG.dataProcessor.rewritePrompt(prompt);
         }
@@ -46,7 +56,7 @@ export const createSend = function (setStopFunctionVisible: { (value: SetStateAc
             sessionId: sessionStorage.getItem('chatSessionId'),
             prompt,
             referer: window.location.href,
-            userId
+            clientId: userId
         };
         const response = await fetch(window.CHATBOT_CONFIG.endpoint, {
             method: 'POST',
@@ -63,10 +73,9 @@ export const createSend = function (setStopFunctionVisible: { (value: SetStateAc
             return;
         }
 
-        // Read a stream of server-sent events
-        // and feed them to the observer as they are being generated
         reader = response.body.getReader();
         const textDecoder = new TextDecoder();
+        var sessionIdCache = '';
         while (true) {
             const { value, done } = await reader.read();
             if (!done) {
@@ -77,11 +86,11 @@ export const createSend = function (setStopFunctionVisible: { (value: SetStateAc
             }
 
             const content = textDecoder.decode(value);
+
             if (content) {
-                const processChunk = window.CHATBOT_CONFIG.dataProcessor?.processChunk || defaultProcessChunk;
                 try {
-                    const [text, sessionId] = processChunk(content);
-                    sessionStorage.setItem('chatSessionId', sessionId);
+                    const [text, sessionId] = defaultProcessChunk(content);
+                    sessionIdCache = sessionId;
                     text && observer.next(text);
                 } catch (e) {
                     console.warn('Parse content failed: ' + content, e);
@@ -89,6 +98,7 @@ export const createSend = function (setStopFunctionVisible: { (value: SetStateAc
                 }
             }
         }
+        sessionIdCache ?? sessionStorage.setItem('chatSessionId', sessionIdCache);
         setStopFunctionVisible(false);
         observer.complete();
     }, stopGenerating];
