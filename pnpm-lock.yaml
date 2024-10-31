@@ -20,6 +20,9 @@ dependencies:
   react-dom:
     specifier: ^18.3.1
     version: 18.3.1(react@18.3.1)
+  uuid:
+    specifier: ^11.0.2
+    version: 11.0.2
 
 devDependencies:
   '@types/lodash':
@@ -1834,6 +1837,11 @@ packages:
     dependencies:
       punycode: 2.3.1
     dev: true
+
+  /uuid@11.0.2:
+    resolution: {integrity: sha512-14FfcOJmqdjbBPdDjFQyk/SdT4NySW4eM0zcG+HqbHP5jzuH56xO3J1DGhgs/cEMCfwYi3HQI1gnTO62iaG+tQ==, tarball: https://registry.npmmirror.com/uuid/-/uuid-11.0.2.tgz}
+    hasBin: true
+    dev: false
 
   /vite@5.4.10:
     resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==, tarball: https://registry.npmmirror.com/vite/-/vite-5.4.10.tgz}

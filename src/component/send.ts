@@ -1,5 +1,6 @@
 import { StreamSend, StreamingAdapterObserver } from '@nlux/react';
 import { SetStateAction } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 // sessionStorage.removeItem('chatSessionId');
 type StopFunction = () => void;
@@ -9,18 +10,18 @@ function defaultProcessChunk(chunks: string) {
     let result = '';
     let sessionId = null;
     chunks.split("\nid").forEach(chunk => {
-      let data: any = chunk.split('HTTP_STATUS/200\ndata:')[1];
-      try {
-        data = JSON.parse(data);
-        sessionId = data.output.session_id;
-        result += data.output.text || '';
-      } catch (e) {
-        throw(e);
-      }
+        let data: any = chunk.split('HTTP_STATUS/200\ndata:')[1];
+        try {
+            data = JSON.parse(data);
+            sessionId = data.output.session_id;
+            result += data.output.text || '';
+        } catch (e) {
+            throw (e);
+        }
     });
     return [result, sessionId];
 }
-export const createSend = function(setStopFunctionVisible: { (value: SetStateAction<boolean>): void }): [StreamSend, StopFunction] {
+export const createSend = function (setStopFunctionVisible: { (value: SetStateAction<boolean>): void }): [StreamSend, StopFunction] {
     const stopGenerating: StopFunction = () => {
         reader && reader.cancel();
     };
@@ -35,11 +36,13 @@ export const createSend = function(setStopFunctionVisible: { (value: SetStateAct
         }
         const body = {
             sessionId: sessionStorage.getItem('chatSessionId'),
-            prompt
+            prompt,
+            referer: window.location.href,
+            userId: uuidv4()
         };
         const response = await fetch(window.CHATBOT_CONFIG.endpoint, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         });
 
@@ -57,7 +60,7 @@ export const createSend = function(setStopFunctionVisible: { (value: SetStateAct
         reader = response.body.getReader();
         const textDecoder = new TextDecoder();
         while (true) {
-            const {value, done} = await reader.read();
+            const { value, done } = await reader.read();
             if (!done) {
                 setStopFunctionVisible(true);
             }

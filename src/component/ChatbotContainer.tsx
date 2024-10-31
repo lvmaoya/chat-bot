@@ -28,7 +28,7 @@ const ChatbotContainer: React.FC = () => {
     <>
       {/* 气泡提示 */}
       <div
-        className={'webchat-bubble-tip ' + styles.bubbleTip}
+        className={`webchat-bubble-tip ${styles.bubbleTip} ${isChatBoxVisible ? styles.bubbleTipVisible : ''}`}
         onClick={toggleChatBox}
       >
         {bubbleTipIcon}

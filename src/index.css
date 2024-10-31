@@ -50,6 +50,8 @@
 .nlux-comp-conversationStarters::before{
   content: "Questions and Answers：";
   font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
 }
 
 .nlux-conversationStarters-container>.nlux-comp-conversationStarters button.nlux-comp-conversationStarter {
@@ -60,9 +62,6 @@
   border-radius: 0;
   font-size: 16px;
   color: #eb9402;
-}
-.nlux-comp-conversationStarter:first-child{
-  padding-top: 10px !important;
 }
 
 .nlux-AiChat-root>.nlux-chatRoom-container>.nlux-composer-container {

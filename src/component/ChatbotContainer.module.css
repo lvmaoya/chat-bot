@@ -61,9 +61,9 @@
   box-shadow: 0 4px 8px 0 #00000029;
   border-radius: 16px;
   overflow: hidden;
-  opacity: 0.3;
+  opacity: 0.1;
   transform: translateY(120%);
-  transition: all .3s;
+  transition: all .5s;
   z-index: 9999999;
 }
 
@@ -74,7 +74,9 @@
   align-items: center;
   background-color: var(--webchat-toolbar-background-color);
 }
-
+.bubbleTipVisible {
+  display: none;
+}
 .chatBoxVisible {
   opacity: 1;
   transform: translateY(0%);
