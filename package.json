@@ -11,10 +11,13 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "markdown-it": "^14.1.0",
+    "uuid": "^11.0.2",
     "vue": "^3.5.12"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.17.0",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/tsconfig": "^0.5.1",

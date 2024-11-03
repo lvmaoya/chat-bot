@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
-import { refreshIcon, closeIcon, stopIcon } from './assets/svgIcons';
-import { handlePostRequestWithEventStream } from './api';
+import { nextTick, ref, watch } from 'vue';
+import { refreshIcon, closeIcon } from './assets/svgIcons';
+import { handlePostRequestWithEventStream, ReceiveState } from './api';
+import { formatLocalTime } from "./utils";
+import Loading from './loading.vue';
+import MarkdownIt from "markdown-it";
 
+enum Role {
+  user = 'user',
+  assistant = 'assistant',
+  system = 'system'
+}
 const isBotContainerVisible = ref(true);
 const onBubbleClick = () => {
   isBotContainerVisible.value = !isBotContainerVisible.value;
@@ -10,26 +18,54 @@ const onBubbleClick = () => {
 }
 
 const inputValue = ref('');
-const handleSubmit = () => {
-  console.log(inputValue.value);
-  chatMessages.value.push({
-    role: 'user',
-    message: inputValue.value
-  },)
-  // 在下一帧执行滚动操作
-  nextTick(() => {
-    scrollToBottom();
-  });
-  handlePostRequestWithEventStream("http://webchat-bot-5hzt.fcv3.1660096712492796.cn-hangzhou.fc.devsapp.net/chat", { prompt: 'hello' });
+const isLoading = ref(false)
+
+const receiver = (state: ReceiveState, value: any) => {
+  switch (state) {
+    case ReceiveState.complete:
+      isLoading.value = false
+      break;
+    case ReceiveState.update:
+      clearInputValue();
+      chatMessages.value[chatMessages.value.length - 1].message += value
+      break;
+    case ReceiveState.error:
+      isLoading.value = false
+      console.log(value);
+      break;
+    default:
+      break;
+  }
+};
+
+const clearInputValue = () => {
+  if (inputValue.value != '') {
+    inputValue.value = ''
+  }
+}
+
+// 添加新消息的函数
+const addMessage = (role: Role, message: any, time: number) => {
+  chatMessages.value.push({ role, message, time });
+};
+const handleSubmit = async () => {
+  if (inputValue.value.trim() == '' || isLoading.value) return;
+  isLoading.value = true;
+  addMessage(Role.user, inputValue.value, Date.now())
+  addMessage(Role.assistant, '', Date.now())
+  handlePostRequestWithEventStream("http://webchat-bot-t9rx.fcv3.1486648470098031.cn-hangzhou.fc.devsapp.net/chat", inputValue.value, receiver);
+
 };
 const chatMessages = ref([
   {
-    role: 'user',
-    message: 'What\'s the capital of Antartica?'
+    role: Role.assistant,
+    message: 'CEEG Customer Service is at your service! How can I assist you today?',
+    time: 0
   },
   {
-    role: 'assistant',
-    message: 'Arrr, matey! The **capital** of _Antarctica_ be none other than `"Arrrctica"`, where ye can find a jolly crew of penguins swashbuckling on icy seas!'
+    role: Role.assistant,
+    message: 'Arrr, matey! The **capital** of _Antarctica_ be none other than `"Arrrctica"`, where ye can find a jolly crew of penguins swashbuckling on icy seas!',
+    time: 0
   }
 ]);
 const scrollContainer = ref();
@@ -39,6 +75,10 @@ const scrollToBottom = () => {
     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
   }
 };
+const markdown = new MarkdownIt()
+
+watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
+
 </script>
 
 <template>
@@ -60,19 +100,39 @@ const scrollToBottom = () => {
     <div class="bot-content" ref="scrollContainer">
       <div v-for="(item, index) in chatMessages" :key="index" class="message-item">
         <div
-          :class="{ 'message-user': item.role === 'user', 'message-assistant': item.role === 'assistant', 'message-system': item.role === 'system' }">
-          <div class="avatar" :class="item.role">{{ item.role }}</div>
-          <div class="content" v-html="item.message"></div>
+          :class="{ 'message-user': item.role === Role.user, 'message-assistant': item.role === Role.assistant, 'message-system': item.role === Role.system }">
+          <div class="content" v-if="item.message" v-html="markdown.render(item.message)"></div>
+          <div class="content" v-else>
+            <Loading></Loading>
+          </div>
         </div>
+        <div>{{ formatLocalTime(item.time) }}</div>
       </div>
+
     </div>
     <div class="bot-input">
       <input type="text" v-model="inputValue" @keyup.enter="handleSubmit" placeholder="输入并按 Enter 提交">
-      <button @click="handleSubmit">提交</button>
+      <button @click="handleSubmit">
+        <svg t="1730631079572" :style="{ fill: inputValue && inputValue.trim() !== '' && !isLoading ? '#666' : '#999' }"
+          viewBox="0 0 1045 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6607" width="21" height="21">
+          <path
+            d="M989.184 87.530667c30.421333-10.154667 60.736 15.637333 55.594667 47.296l-128 789.333333a42.666667 42.666667 0 0 1-63.082667 30.336l-340.736-192.213333-154.837333 66.282666a42.666667 42.666667 0 0 1-59.349334-36.181333L298.666667 789.269333l0.256-147.733333-277.226667-156.373333c-31.168-17.6-27.882667-62.890667 4.181333-76.394667l3.306667-1.237333z m-39.936 103.232L147.349333 458.069333l215.253334 121.408a42.666667 42.666667 0 0 1 21.546666 33.706667l0.149334 3.541333-0.192 107.882667 114.666666-49.066667a42.666667 42.666667 0 0 1 34.218667 0.277334l3.541333 1.792 305.792 172.501333 106.922667-659.349333z m-127.146667 123.264a42.666667 42.666667 0 0 1-2.858666 57.728l-2.602667 2.346666-256 213.333334a42.666667 42.666667 0 0 1-57.216-63.189334l2.602667-2.346666 256-213.333334a42.666667 42.666667 0 0 1 60.074666 5.461334z"
+            p-id="6608"></path>
+        </svg>
+      </button>
     </div>
   </div>
 </template>
+<style>
+p {
+  padding: 0;
+  margin: 0;
+}
 
+.bot-containner {
+  color: #171a20;
+}
+</style>
 <style scoped>
 .bot-trigger {
   position: fixed;
@@ -99,12 +159,13 @@ const scrollToBottom = () => {
 }
 
 .bot-containner {
-  width: 430px;
-  height: 600px;
+  width: 435px;
+  height: 80vh;
+  max-height: 712px;
   position: fixed;
   bottom: 24px;
   right: 24px;
-  box-shadow: 0 4px 8px 0 #00000029;
+  box-shadow: 0 1px 8px 0 #47474729;
   /* background-color: red; */
   border-radius: 16px;
   overflow: hidden;
@@ -112,9 +173,34 @@ const scrollToBottom = () => {
   transform: translateY(120%);
   transition: all .5s;
   z-index: 9999999;
-  padding: 0 20px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 0
+  }
+
+  ::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, .1);
+    -webkit-transition: color .2s ease;
+    transition: color .2s ease
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, .5)
+  }
+
+
 }
 
 .bot-containner-show {
@@ -124,68 +210,129 @@ const scrollToBottom = () => {
 }
 
 .bot-header {
-  height: 80px;
+  height: 70px;
   display: flex;
+  padding-left: 20px;
+  padding-right: 10px;
+  /* box-shadow: 0 1px 2px 0 rgba(219, 219, 219, 0.2); */
+
   align-items: center;
   justify-content: space-between;
 
-  .logo img {
-    width: 170px;
+  .logo {
+    line-height: 0;
+
+    img {
+      width: 170px;
+    }
   }
 
+
   .toolbar {
+    display: flex;
+
     svg {
       font-size: 18px;
       fill: #333;
+    }
+
+    button {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: transparent;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-color: transparent;
+      transition: all 0.2s;
+
+      &:first-child {
+        margin-right: 4px;
+      }
+
+      &:hover {
+        background-color: #c0c0c029;
+      }
+
+      &:active {
+        transform: scale(0.9);
+      }
     }
   }
 }
 
 .bot-content {
   flex: 1;
-  background-color: gray;
   overflow-y: scroll;
+  padding-left: 20px;
+  padding-right: 14px;
 
   .message-item {
     display: flex;
-    padding: 10px 0px;
+    flex-direction: column;
+    padding: 8px 0px;
 
     &>div {
       display: flex;
       gap: 10px;
     }
 
-    &>div:not(.message-assistant) {
-      flex-direction: row-reverse;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      background-color: red;
-      border-radius: 50%;
+    .content {
+      width: fit-content;
+      background-color: #f4f4f4;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 22px;
     }
   }
 
   .message-user {
     width: 90%;
-    background-color: #eb9402;
     margin-left: auto;
+    justify-content: end;
 
+    & .content {
+      border-radius: 0.5rem 0 0.5rem 0.5rem;
+      background-color: #ffa305;
+      color: white;
+    }
+
+    &+div {
+      font-size: 12px;
+      justify-content: end;
+      margin-right: 6px;
+      margin-top: 3px;
+      color: #999;
+    }
   }
 
   .message-assistant {
     width: 90%;
-    background-color: #eb9402;
     margin-right: auto;
+
+    & .content {
+      border-radius: 0 0.5rem 0.5rem 0.5rem;
+    }
+
+    &+div {
+      font-size: 12px;
+      justify-self: start;
+      margin-left: 6px;
+      margin-top: 3px;
+      color: #999;
+    }
   }
 }
 
 .bot-input {
   width: 100%;
   display: flex;
-  background-color: red;
   height: 60px;
+  box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2);
+  box-sizing: border-box;
+  padding-left: 18px;
+  padding-right: 10px;
 
   input {
     flex: 1;
@@ -196,5 +343,13 @@ const scrollToBottom = () => {
       outline: none;
     }
   }
+
+  button {
+    height: 100%;
+    border: none;
+    aspect-ratio: 1/1;
+    background-color: transparent;
+  }
+
 }
 </style>
