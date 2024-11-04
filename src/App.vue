@@ -5,6 +5,7 @@ import { handlePostRequestWithEventStream, ReceiveState } from './api';
 import { formatLocalTime } from "./utils";
 import Loading from './loading.vue';
 import MarkdownIt from "markdown-it";
+import { notice } from './config';
 
 enum Role {
   user = 'user',
@@ -13,8 +14,7 @@ enum Role {
 }
 const isBotContainerVisible = ref(true);
 const onBubbleClick = () => {
-  isBotContainerVisible.value = !isBotContainerVisible.value;
-  console.log(isBotContainerVisible.value);
+  isBotContainerVisible.value = true;
 }
 
 const inputValue = ref('');
@@ -58,13 +58,18 @@ const handleSubmit = async () => {
 };
 const chatMessages = ref([
   {
+    role: Role.system,
+    message: notice,
+    time: 0
+  },
+  {
     role: Role.assistant,
     message: 'CEEG Customer Service is at your service! How can I assist you today?',
     time: 0
   },
   {
     role: Role.assistant,
-    message: 'Arrr, matey! The **capital** of _Antarctica_ be none other than `"Arrrctica"`, where ye can find a jolly crew of penguins swashbuckling on icy seas!',
+    message: `\###### Questions and Answers： - \[What is the capital of France\](https://lvmaoya.cn/home) - \[Who is the most handsome person in the world\](https://lvmaoya.cn/home) - \[Please share a story with me\](https://lvmaoya.cn/home) - \[Tell me a joke\](https://lvmaoya.cn/home) - \[Introduce yourself\](https://lvmaoya.cn/home)`,
     time: 0
   }
 ]);
@@ -75,6 +80,9 @@ const scrollToBottom = () => {
     scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
   }
 };
+const onCloseDialogClick = () => {
+  isBotContainerVisible.value = false
+}
 const markdown = new MarkdownIt()
 
 watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
@@ -82,8 +90,13 @@ watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
 </script>
 
 <template>
-  <div class="bot-trigger" @click="onBubbleClick">
+  <div class="bot-trigger" @click="onBubbleClick" :class="{ 'hidden': isBotContainerVisible }">
 
+    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5423" width="35" height="35">
+      <path
+        d="M240 658.08h220.784l55.744 65.04 55.744-65.04h220.768V272H240v386.08z m-48 32V240a16 16 0 0 1 16-16h617.04a16 16 0 0 1 16 16v450.08a16 16 0 0 1-16 16H594.336l-65.664 76.64a16 16 0 0 1-24.304 0l-65.664-76.64H208a16 16 0 0 1-16-16zM366.256 498.56a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z m150.272 0a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z m150.24 0a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z"
+        fill="#ffffff" p-id="5424"></path>
+    </svg>
   </div>
   <div class="bot-containner" :class="{ 'bot-containner-show': isBotContainerVisible }">
     <div class="bot-header">
@@ -93,25 +106,29 @@ watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
       <div class="toolbar">
         <button v-html="refreshIcon">
         </button>
-        <button v-html="closeIcon">
+        <button v-html="closeIcon" @click="onCloseDialogClick">
         </button>
       </div>
     </div>
     <div class="bot-content" ref="scrollContainer">
       <div v-for="(item, index) in chatMessages" :key="index" class="message-item">
-        <div
-          :class="{ 'message-user': item.role === Role.user, 'message-assistant': item.role === Role.assistant, 'message-system': item.role === Role.system }">
+        <div :class="{ 'message-user': item.role === Role.user, 'message-assistant': item.role === Role.assistant }"
+          v-if="item.role === Role.user || item.role === Role.assistant">
           <div class="content" v-if="item.message" v-html="markdown.render(item.message)"></div>
           <div class="content" v-else>
             <Loading></Loading>
           </div>
+        </div>
+        <div :class="{ 'message-system': item.role === Role.system }"
+          v-else-if="item.role === Role.system && item.message">
+          <div v-html="item.message"></div>
         </div>
         <div>{{ formatLocalTime(item.time) }}</div>
       </div>
 
     </div>
     <div class="bot-input">
-      <input type="text" v-model="inputValue" @keyup.enter="handleSubmit" placeholder="输入并按 Enter 提交">
+      <input type="text" v-model="inputValue" @keyup.enter="handleSubmit" placeholder="Please enter your questions">
       <button @click="handleSubmit">
         <svg t="1730631079572" :style="{ fill: inputValue && inputValue.trim() !== '' && !isLoading ? '#666' : '#999' }"
           viewBox="0 0 1045 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6607" width="21" height="21">
@@ -132,6 +149,10 @@ p {
 .bot-containner {
   color: #171a20;
 }
+
+.hidden {
+  display: none;
+}
 </style>
 <style scoped>
 .bot-trigger {
@@ -145,7 +166,7 @@ p {
   transition: 0.3s;
   cursor: pointer;
   z-index: 999999;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
 
@@ -176,6 +197,7 @@ p {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background-color: white;
 
   ::-webkit-scrollbar {
     -webkit-appearance: none;
