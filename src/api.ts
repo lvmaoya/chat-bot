@@ -14,12 +14,14 @@ export async function handlePostRequestWithEventStream(url: string | URL, data: 
         referer: window.location.href,
         clientId: userId
     };
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-    if (response.status !== 200) {
+    let response;
+    try {
+        response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+    } catch (error) {
         callback(ReceiveState.error, 'Failed to connect to the server.')
         return;
     }
@@ -51,7 +53,7 @@ export async function handlePostRequestWithEventStream(url: string | URL, data: 
 
         }
     }
-    localStorage.setItem(SESSION_ID, chatSessionId);
+    sessionStorage.setItem(SESSION_ID, chatSessionId);
     callback(ReceiveState.complete)
 }
 function defaultProcessChunk(chunks: string) {

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { refreshIcon, closeIcon } from './assets/svgIcons';
 import { handlePostRequestWithEventStream, ReceiveState } from './api';
 import { formatLocalTime } from "./utils";
 import Loading from './loading.vue';
 import MarkdownIt from "markdown-it";
-import { notice } from './config';
+import { HISTORY, KEEP_STORAGE_SIZE, LAST_CONVERSATION_TIME, MAX_STORAGE_SIZE, MAX_TIME_INTERVAL, SESSION_ID } from './config';
 
 enum Role {
   user = 'user',
@@ -24,6 +24,7 @@ const receiver = (state: ReceiveState, value: any) => {
   switch (state) {
     case ReceiveState.complete:
       isLoading.value = false
+      setHistory();
       break;
     case ReceiveState.update:
       clearInputValue();
@@ -31,7 +32,8 @@ const receiver = (state: ReceiveState, value: any) => {
       break;
     case ReceiveState.error:
       isLoading.value = false
-      console.log(value);
+      chatMessages.value[chatMessages.value.length - 1].message += value
+      setHistory();
       break;
     default:
       break;
@@ -54,25 +56,17 @@ const handleSubmit = async () => {
   addMessage(Role.user, inputValue.value, Date.now())
   addMessage(Role.assistant, '', Date.now())
   handlePostRequestWithEventStream("http://webchat-bot-t9rx.fcv3.1486648470098031.cn-hangzhou.fc.devsapp.net/chat", inputValue.value, receiver);
-
 };
-const chatMessages = ref([
-  {
-    role: Role.system,
-    message: notice,
-    time: 0
-  },
-  {
-    role: Role.assistant,
-    message: 'CEEG Customer Service is at your service! How can I assist you today?',
-    time: 0
-  },
-  {
-    role: Role.assistant,
-    message: `\###### Questions and Answers： - \[What is the capital of France\](https://lvmaoya.cn/home) - \[Who is the most handsome person in the world\](https://lvmaoya.cn/home) - \[Please share a story with me\](https://lvmaoya.cn/home) - \[Tell me a joke\](https://lvmaoya.cn/home) - \[Introduce yourself\](https://lvmaoya.cn/home)`,
-    time: 0
-  }
-]);
+const chatMessages = ref<Array<{ role: Role, message: string, time: number }>>([]);
+const greetingMessage = ['Hi, there! CEEG Customer Service is at your service! How can I assist you today?'];
+
+const questionsPrompt = [
+  "What is the capital of France",
+  "Who is the most handsome person in the world",
+  "Please share a story with me",
+  "Tell me a joke",
+  "Introduce yourself",
+]
 const scrollContainer = ref();
 
 const scrollToBottom = () => {
@@ -85,13 +79,46 @@ const onCloseDialogClick = () => {
 }
 const markdown = new MarkdownIt()
 
-watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
+const onPromptClick = (value: string) => {
+  inputValue.value = value;
+  handleSubmit()
+}
+const onRefreshClick = () => {
+  if (isLoading.value) return;
+  chatMessages.value.length = 0;
+  sessionStorage.removeItem(SESSION_ID);
+  localStorage.removeItem(HISTORY);
+  localStorage.removeItem(LAST_CONVERSATION_TIME);
+}
+const setHistory = () => {
+  let historyList = [...chatMessages.value]
+  if (historyList.length > MAX_STORAGE_SIZE) {
+    historyList = historyList.slice(-KEEP_STORAGE_SIZE);
+  }
+  localStorage.setItem(HISTORY, JSON.stringify(historyList));
+  localStorage.setItem(LAST_CONVERSATION_TIME, new Date().getTime().toString());
+};
+const getHistory = () => {
+  let lastConversationTime = localStorage.getItem(LAST_CONVERSATION_TIME);
+  const currentTime = new Date().getTime();
+  if (lastConversationTime && (currentTime - parseInt(lastConversationTime, 10) > MAX_TIME_INTERVAL)) {
+    localStorage.removeItem(HISTORY);
+  } else {
+    chatMessages.value.push(...JSON.parse(localStorage.getItem(HISTORY) || '[]'));
+  }
+};
+onBeforeMount(() => {
+  getHistory();
+});
+
+watch(chatMessages.value, () => {
+  nextTick(() => scrollToBottom())
+});
 
 </script>
 
 <template>
   <div class="bot-trigger" @click="onBubbleClick" :class="{ 'hidden': isBotContainerVisible }">
-
     <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5423" width="35" height="35">
       <path
         d="M240 658.08h220.784l55.744 65.04 55.744-65.04h220.768V272H240v386.08z m-48 32V240a16 16 0 0 1 16-16h617.04a16 16 0 0 1 16 16v450.08a16 16 0 0 1-16 16H594.336l-65.664 76.64a16 16 0 0 1-24.304 0l-65.664-76.64H208a16 16 0 0 1-16-16zM366.256 498.56a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z m150.272 0a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z m150.24 0a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z"
@@ -101,16 +128,35 @@ watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
   <div class="bot-containner" :class="{ 'bot-containner-show': isBotContainerVisible }">
     <div class="bot-header">
       <div class="logo">
-        <img src="https://www.ceeg.cn/en/assets/v1/2024-9/upload/logo.svg" alt="ceeg" />
+        <img src="@/assets/logo.jpg" alt="ceeg" />
       </div>
       <div class="toolbar">
-        <button v-html="refreshIcon">
+        <button v-html="refreshIcon" @click="onRefreshClick">
         </button>
         <button v-html="closeIcon" @click="onCloseDialogClick">
         </button>
       </div>
     </div>
     <div class="bot-content" ref="scrollContainer">
+      <div class="message-item" v-for="item in greetingMessage">
+        <div class="message-assistant">
+          <div class="content">
+            {{ item }}
+          </div>
+        </div>
+      </div>
+      <div class="message-item">
+        <div class="message-assistant">
+          <div class="content">
+            <p>Questions and Answers:</p>
+            <ul>
+              <li v-for="item in questionsPrompt" @click="onPromptClick(item)">
+                <a href="javascript:;">{{ item }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <div v-for="(item, index) in chatMessages" :key="index" class="message-item">
         <div :class="{ 'message-user': item.role === Role.user, 'message-assistant': item.role === Role.assistant }"
           v-if="item.role === Role.user || item.role === Role.assistant">
@@ -130,31 +176,21 @@ watch(chatMessages.value, () => nextTick(() => scrollToBottom()));
     <div class="bot-input">
       <input type="text" v-model="inputValue" @keyup.enter="handleSubmit" placeholder="Please enter your questions">
       <button @click="handleSubmit">
-        <svg t="1730631079572" :style="{ fill: inputValue && inputValue.trim() !== '' && !isLoading ? '#666' : '#999' }"
-          viewBox="0 0 1045 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6607" width="21" height="21">
+        <svg t="1730723754099" :style="{ fill: inputValue && inputValue.trim() !== '' && !isLoading ? '#666' : '#999' }"
+          width="21" height="21" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12458">
           <path
-            d="M989.184 87.530667c30.421333-10.154667 60.736 15.637333 55.594667 47.296l-128 789.333333a42.666667 42.666667 0 0 1-63.082667 30.336l-340.736-192.213333-154.837333 66.282666a42.666667 42.666667 0 0 1-59.349334-36.181333L298.666667 789.269333l0.256-147.733333-277.226667-156.373333c-31.168-17.6-27.882667-62.890667 4.181333-76.394667l3.306667-1.237333z m-39.936 103.232L147.349333 458.069333l215.253334 121.408a42.666667 42.666667 0 0 1 21.546666 33.706667l0.149334 3.541333-0.192 107.882667 114.666666-49.066667a42.666667 42.666667 0 0 1 34.218667 0.277334l3.541333 1.792 305.792 172.501333 106.922667-659.349333z m-127.146667 123.264a42.666667 42.666667 0 0 1-2.858666 57.728l-2.602667 2.346666-256 213.333334a42.666667 42.666667 0 0 1-57.216-63.189334l2.602667-2.346666 256-213.333334a42.666667 42.666667 0 0 1 60.074666 5.461334z"
-            p-id="6608"></path>
+            d="M392.021 925.013a34.133 34.133 0 0 1-34.133-34.133V579.243a34.002 34.002 0 0 1 12.63-26.454l276.48-224.085a34.1 34.1 0 0 1 43.007 52.907l-263.85 213.845v192.853l82.944-110.592c10.069-13.482 28.672-17.578 43.52-9.557l137.557 73.728L853.333 156.16c3.243-11.435-3.413-18.603-6.485-21.163-3.072-2.56-11.093-7.85-21.845-2.901L206.336 422.4l80.213 46.08c16.384 9.387 22.016 30.208 12.63 46.592s-30.208 22.016-46.592 12.63L115.54 449.023a33.98 33.98 0 0 1-17.066-31.061c0.512-12.8 8.021-24.064 19.626-29.526L795.99 70.315c31.744-14.848 68.096-10.07 94.891 12.629a87.79 87.79 0 0 1 28.16 91.477L744.277 801.28a34.082 34.082 0 0 1-48.981 20.821L546.133 742.06 419.328 911.36c-6.656 8.704-16.896 13.653-27.307 13.653z"
+            p-id="12459"></path>
         </svg>
       </button>
     </div>
   </div>
 </template>
 <style>
-p {
-  padding: 0;
-  margin: 0;
-}
-
-.bot-containner {
-  color: #171a20;
-}
-
 .hidden {
-  display: none;
+  display: none !important;
 }
-</style>
-<style scoped>
+
 .bot-trigger {
   position: fixed;
   width: 50px;
@@ -187,7 +223,7 @@ p {
   bottom: 24px;
   right: 24px;
   box-shadow: 0 1px 8px 0 #47474729;
-  /* background-color: red; */
+  color: #171a20;
   border-radius: 16px;
   overflow: hidden;
   opacity: 0.1;
@@ -198,6 +234,10 @@ p {
   flex-direction: column;
   box-sizing: border-box;
   background-color: white;
+
+  a {
+    color: #eb9402;
+  }
 
   ::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -245,7 +285,7 @@ p {
     line-height: 0;
 
     img {
-      width: 170px;
+      width: 80px;
     }
   }
 
@@ -298,6 +338,14 @@ p {
     &>div {
       display: flex;
       gap: 10px;
+    }
+
+    /* &:first-child {
+      margin-top: 20px;
+    } */
+
+    &:nth-child(2) .content {
+      line-height: 2 !important;
     }
 
     .content {
