@@ -109,7 +109,10 @@ const getHistory = () => {
 };
 onBeforeMount(() => {
   getHistory();
+  isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 });
+
+const isMobile = ref(false);
 
 watch(chatMessages.value, () => {
   nextTick(() => scrollToBottom())
@@ -125,7 +128,8 @@ watch(chatMessages.value, () => {
         fill="#ffffff" p-id="5424"></path>
     </svg>
   </div>
-  <div class="bot-containner" :class="{ 'bot-containner-show': isBotContainerVisible }">
+  <div class="bot-containner"
+    :class="{ 'bot-containner-show': isBotContainerVisible, 'bot-mobile-container': isMobile }">
     <div class="bot-header">
       <div class="logo">
         <img src="@/assets/logo.jpg" alt="ceeg" />
@@ -268,7 +272,15 @@ watch(chatMessages.value, () => {
 .bot-containner-show {
   opacity: 1;
   transform: translateY(0%);
-  transition: opacity .5s transform .5s;
+  transition: opacity .5s, transform .5s;
+}
+
+.bot-mobile-container {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-radius: 16px 16px 0 0;
 }
 
 .bot-header {
