@@ -58,7 +58,7 @@ const handleSubmit = async () => {
   handlePostRequestWithEventStream("http://webchat-bot-t9rx.fcv3.1486648470098031.cn-hangzhou.fc.devsapp.net/chat", inputValue.value, receiver);
 };
 const chatMessages = ref<Array<{ role: Role, message: string, time: number }>>([]);
-const greetingMessage = ['Hi, there! CEEG Customer Service is at your service! How can I assist you today?'];
+const greetingMessage = ['Hi, there! Lvmaoya is at your service! How can I assist you today?'];
 
 const questionsPrompt = [
   "What is the capital of France",
@@ -128,7 +128,8 @@ watch(chatMessages.value, () => {
   <div class="bot-containner" :class="{ 'bot-containner-show': isBotContainerVisible }">
     <div class="bot-header">
       <div class="logo">
-        <img src="@/assets/logo.jpg" alt="ceeg" />
+        <!-- <img src="@/assets/avatar.png" alt="lvmaoya" /> -->
+        <span>Lvmaoya</span>
       </div>
       <div class="toolbar">
         <button v-html="refreshIcon" @click="onRefreshClick">
@@ -283,9 +284,16 @@ watch(chatMessages.value, () => {
 
   .logo {
     line-height: 0;
-
+    display: flex;
+    align-items: center;
     img {
-      width: 80px;
+      width: 45px;
+      border-radius: 50%;
+    }
+    span{
+      /* margin-top: 20px;
+      margin-left: 10px; */
+      font-weight: 600;
     }
   }
 
