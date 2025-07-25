@@ -6,8 +6,11 @@
 
 项目包含两张截图，展示了聊天机器人的界面效果：
 
-- 聊天界面截图1：`/src/assets/imgs/Snipaste_2025-07-25_14-37-52.png`
-- 聊天界面截图2：`/src/assets/imgs/Snipaste_2025-07-25_14-38-11.png`
+- 聊天界面截图1：
+![image](/src/assets/imgs/Snipaste_2025-07-25_14-37-52.png)
+
+- 聊天界面截图2：
+![image](/src/assets/imgs/Snipaste_2025-07-25_14-38-11.png)
 
 ## 功能特点
 
