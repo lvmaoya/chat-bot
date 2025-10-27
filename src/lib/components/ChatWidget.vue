@@ -197,8 +197,8 @@ watch(chatMessages, () => {
   </div>
 </template>
 
-<style scoped>
-.hidden { display: none !important; }
+<style>
+.bot-trigger.hidden { display: none !important; }
 
 .bot-trigger {
   position: fixed; width: 50px; height: 40px; border-radius: 4px; background-color: #eb9402; bottom: 40px; right: 40px;
