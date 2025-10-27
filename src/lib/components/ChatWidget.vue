@@ -213,6 +213,9 @@ watch(chatMessages, () => {
   display: flex; flex-direction: column; box-sizing: border-box; background-color: white;
 }
 .bot-containner a { color: #eb9402; text-decoration: none; outline: none; }
+.bot-containner ul, .bot-containner p, .bot-containner button { padding: 0; margin: 0; }
+.bot-containner li { list-style: none; }
+.bot-containner img { border: 0; }
 
 .bot-containner-show { opacity: 1; transform: translateY(0%); transition: opacity .5s, transform .5s; }
 .bot-mobile-container { left: 0; right: 0; bottom: 0; width: 100%; border-radius: 16px 16px 0 0; }
@@ -223,7 +226,7 @@ watch(chatMessages, () => {
 .bot-header .logo span { font-weight: 600; }
 .bot-header .toolbar { display: flex; }
 .bot-header .toolbar svg { font-size: 18px; fill: #333; }
-.bot-header .toolbar button { width: 2.5rem; height: 2.5rem; background-color: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; border-color: transparent; transition: all 0.2s; }
+.bot-header .toolbar button { width: 2.5rem; height: 2.5rem; background-color: transparent; border-radius: 50%; display: flex; justify-content: center; align-items: center; border-color: transparent; transition: all 0.2s; cursor: pointer; }
 .bot-header .toolbar button:first-child { margin-right: 4px; }
 .bot-header .toolbar button:hover { background-color: #c0c0c029; }
 .bot-header .toolbar button:active { transform: scale(0.9); }
@@ -240,7 +243,8 @@ watch(chatMessages, () => {
 .bot-content::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.5); }
 
 .bot-content .message-user { width: 90%; margin-left: auto; justify-content: end; }
-.bot-content .message-user .content { border-radius: 0.5rem 0 0.5rem 0.5rem; background-color: #ffa305; color: white; }
+.bot-content .message-user .content { border-radius: 0.5rem 0 0.5rem 0.5rem; background-color: #ffa305; }
+.bot-content .message-user .content p { color: white; }
 .bot-content .message-user+div { font-size: 12px; justify-content: end; margin-right: 6px; margin-top: 3px; color: #999; }
 
 .bot-content .message-assistant { width: 90%; margin-right: auto; }
