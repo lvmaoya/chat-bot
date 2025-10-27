@@ -132,7 +132,7 @@ watch(chatMessages.value, () => {
     :class="{ 'bot-containner-show': isBotContainerVisible, 'bot-mobile-container': isMobile }">
     <div class="bot-header">
       <div class="logo">
-        <!-- <img src="@/assets/avatar.png" alt="lvmaoya" /> -->
+        <img src="@/assets/avatar.png" alt="lvmaoya" />
         <span>Lvmaoya</span>
       </div>
       <div class="toolbar">
