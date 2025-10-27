@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeMount, ref, watch } from 'vue';
-import { refreshIcon, closeIcon } from '../assets/svgIcons';
+import { refreshIcon, closeIcon } from '../icons/svgIcons';
 import { handlePostRequestWithEventStream, ReceiveState } from '../api';
 import { formatLocalTime } from "../utils";
-import Loading from '../loading.vue';
+import Loading from './Loading.vue';
 import MarkdownIt from "markdown-it";
 import { HISTORY, KEEP_STORAGE_SIZE, LAST_CONVERSATION_TIME, MAX_STORAGE_SIZE, MAX_TIME_INTERVAL, SESSION_ID } from '../config';
 
@@ -212,7 +212,7 @@ watch(chatMessages, () => {
   color: #171a20; border-radius: 16px; overflow: hidden; opacity: 0.1; transform: translateY(120%); transition: all .5s; z-index: 9999999;
   display: flex; flex-direction: column; box-sizing: border-box; background-color: white;
 }
-.bot-containner a { color: #eb9402; }
+.bot-containner a { color: #eb9402; text-decoration: none; outline: none; }
 
 .bot-containner-show { opacity: 1; transform: translateY(0%); transition: opacity .5s, transform .5s; }
 .bot-mobile-container { left: 0; right: 0; bottom: 0; width: 100%; border-radius: 16px 16px 0 0; }
@@ -248,7 +248,7 @@ watch(chatMessages, () => {
 .bot-content .message-assistant+div { font-size: 12px; justify-self: start; margin-left: 6px; margin-top: 3px; color: #999; }
 
 .bot-input { width: 100%; display: flex; height: 60px; box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2); box-sizing: border-box; padding-left: 18px; padding-right: 10px; }
-.bot-input input { flex: 1; border: none; }
+.bot-input input { flex: 1; border: none; margin: 0; padding: 0; outline: 0; }
 .bot-input input:focus { border: none; outline: none; }
 .bot-input button { height: 100%; border: none; aspect-ratio: 1/1; background-color: transparent; }
 </style>

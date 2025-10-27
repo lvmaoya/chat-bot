@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ChatWidget from './lib/ChatWidget.vue';
+import ChatWidget from './lib/components/ChatWidget.vue';
 
 // 示例属性，可根据需要调整
 const endpointUrl = "http://webchat-bot-t9rx.fcv3.1486648470098031.cn-hangzhou.fc.devsapp.net/chat";
