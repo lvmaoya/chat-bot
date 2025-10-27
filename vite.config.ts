@@ -12,5 +12,19 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  build: {
+    lib: {
+      entry: fileURLToPath(new URL('./src/lib/index.ts', import.meta.url)),
+      name: 'ChatBotWidget',
+      formats: ['es', 'umd'],
+      fileName: (format) => format === 'es' ? 'chat-bot-widget.mjs' : 'chat-bot-widget.umd.js',
+    },
+    rollupOptions: {
+      external: ['vue'],
+      output: {
+        globals: { vue: 'Vue' }
+      }
+    }
   }
 })
