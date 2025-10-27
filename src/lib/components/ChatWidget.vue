@@ -252,7 +252,7 @@ watch(chatMessages, () => {
 .bot-content .message-assistant+div { font-size: 12px; justify-self: start; margin-left: 6px; margin-top: 3px; color: #999; }
 
 .bot-input { width: 100%; display: flex; height: 60px; box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2); box-sizing: border-box; padding-left: 18px; padding-right: 10px; }
-.bot-input input { flex: 1; border: none; margin: 0; padding: 0; outline: 0; background-color: transparent; }
+.bot-input input { flex: 1; border: none; margin: 0; padding: 0; outline: 0; background-color: transparent; font-size: 14px; }
 .bot-input input:focus { border: none; outline: none; box-shadow: none }
 .bot-input button { height: 100%; border: none; aspect-ratio: 1/1; background-color: transparent; }
 </style>
