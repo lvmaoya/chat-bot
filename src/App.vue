@@ -11,11 +11,12 @@ const questions = [
   "Tell me a joke",
   "Introduce yourself",
 ];
+const botName = 'Lvmaoya';
 </script>
 
 <template>
   <!-- 开发预览用的示例壳：直接使用库组件 -->
-  <ChatWidget :bubble="true" :endpointUrl="endpointUrl" :greetings="greetings" :questions="questions" />
+  <ChatWidget :bubble="true" :endpointUrl="endpointUrl" :greetings="greetings" :questions="questions" :botName="botName" />
 </template>
 
 <style>

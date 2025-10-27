@@ -12,6 +12,7 @@ const props = defineProps<{
   greetings?: string[];
   questions?: string[];
   bubble?: boolean;
+  botName?: string;
 }>();
 
 enum Role {
@@ -70,6 +71,7 @@ const handleSubmit = async () => {
 };
 
 const chatMessages = ref<Array<{ role: Role, message: string, time: number }>>([]);
+const botName = computed(() => props.botName ?? 'Lvmaoya');
 const greetingMessage = computed(() => props.greetings ?? ['Hi, there! Lvmaoya is at your service! How can I assist you today?']);
 const questionsPrompt = computed(() => props.questions ?? [
   "What is the capital of France",
@@ -144,7 +146,7 @@ watch(chatMessages, () => {
       :class="{ 'bot-containner-show': isBotContainerVisible, 'bot-mobile-container': isMobile }">
       <div class="bot-header">
         <div class="logo">
-          <span>Lvmaoya</span>
+          <span>{{ botName }}</span>
         </div>
         <div class="toolbar">
           <button v-html="refreshIcon" @click="onRefreshClick"></button>
@@ -157,7 +159,7 @@ watch(chatMessages, () => {
             <div class="content">{{ item }}</div>
           </div>
         </div>
-        <div class="message-item">
+        <div class="message-item" v-if="questionsPrompt.length">
           <div class="message-assistant">
             <div class="content">
               <p>Questions and Answers:</p>

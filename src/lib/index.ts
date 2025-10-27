@@ -9,6 +9,7 @@ export type ChatWidgetProps = {
   greetings?: string[];
   questions?: string[];
   bubble?: boolean;
+  botName?: string;
 };
 
 export function install(app: App) {
