@@ -213,10 +213,6 @@ watch(chatMessages, () => {
   display: flex; flex-direction: column; box-sizing: border-box; background-color: white;
 }
 .bot-containner a { color: #eb9402; }
-.bot-containner::-webkit-scrollbar { -webkit-appearance: none; width: 4px; height: 4px; }
-.bot-containner::-webkit-scrollbar-track { background: transparent; border-radius: 0; }
-.bot-containner::-webkit-scrollbar-thumb { cursor: pointer; border-radius: 5px; background: rgba(0,0,0,.1); transition: color .2s ease; }
-.bot-containner::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.5); }
 
 .bot-containner-show { opacity: 1; transform: translateY(0%); transition: opacity .5s, transform .5s; }
 .bot-mobile-container { left: 0; right: 0; bottom: 0; width: 100%; border-radius: 16px 16px 0 0; }
@@ -237,6 +233,11 @@ watch(chatMessages, () => {
 .bot-content .message-item>div { display: flex; gap: 10px; }
 .bot-content .message-item:nth-child(2) .content { line-height: 2 !important; }
 .bot-content .message-item .content { width: fit-content; background-color: #f4f4f4; padding: 14px; font-size: 14px; line-height: 22px; }
+
+.bot-content::-webkit-scrollbar { -webkit-appearance: none; width: 4px; height: 4px; }
+.bot-content::-webkit-scrollbar-track { background: transparent; border-radius: 0; }
+.bot-content::-webkit-scrollbar-thumb { cursor: pointer; border-radius: 5px; background: rgba(0,0,0,.1); transition: color .2s ease; }
+.bot-content::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.5); }
 
 .bot-content .message-user { width: 90%; margin-left: auto; justify-content: end; }
 .bot-content .message-user .content { border-radius: 0.5rem 0 0.5rem 0.5rem; background-color: #ffa305; color: white; }

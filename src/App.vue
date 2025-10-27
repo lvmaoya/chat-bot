@@ -15,7 +15,7 @@ const questions = [
 
 <template>
   <!-- 开发预览用的示例壳：直接使用库组件 -->
-  <ChatWidget :bubble="false" :endpointUrl="endpointUrl" :greetings="greetings" :questions="questions" />
+  <ChatWidget :bubble="true" :endpointUrl="endpointUrl" :greetings="greetings" :questions="questions" />
 </template>
 
 <style>
