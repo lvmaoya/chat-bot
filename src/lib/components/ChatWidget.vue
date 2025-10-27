@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeMount, ref, watch } from 'vue';
-import { refreshIcon, closeIcon } from '../icons/svgIcons';
-import { handlePostRequestWithEventStream, ReceiveState } from '../api';
-import { formatLocalTime } from "../utils";
+import { refreshIcon, closeIcon } from '../icons/svgIcons.ts';
+import { handlePostRequestWithEventStream, ReceiveState } from '../api.ts';
+import { formatLocalTime } from "../utils.ts";
 import Loading from './Loading.vue';
 import MarkdownIt from "markdown-it";
-import { HISTORY, KEEP_STORAGE_SIZE, LAST_CONVERSATION_TIME, MAX_STORAGE_SIZE, MAX_TIME_INTERVAL, SESSION_ID } from '../config';
+import { HISTORY, KEEP_STORAGE_SIZE, LAST_CONVERSATION_TIME, MAX_STORAGE_SIZE, MAX_TIME_INTERVAL, SESSION_ID } from '../config.ts';
 
 const props = defineProps<{
   endpointUrl?: string;
@@ -197,7 +197,7 @@ watch(chatMessages, () => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .hidden { display: none !important; }
 
 .bot-trigger {
@@ -252,7 +252,7 @@ watch(chatMessages, () => {
 .bot-content .message-assistant+div { font-size: 12px; justify-self: start; margin-left: 6px; margin-top: 3px; color: #999; }
 
 .bot-input { width: 100%; display: flex; height: 60px; box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2); box-sizing: border-box; padding-left: 18px; padding-right: 10px; }
-.bot-input input { flex: 1; border: none; margin: 0; padding: 0; outline: 0; }
-.bot-input input:focus { border: none; outline: none; }
+.bot-input input { flex: 1; border: none; margin: 0; padding: 0; outline: 0; background-color: transparent; }
+.bot-input input:focus { border: none; outline: none; box-shadow: none }
 .bot-input button { height: 100%; border: none; aspect-ratio: 1/1; background-color: transparent; }
 </style>
