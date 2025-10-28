@@ -10,6 +10,16 @@ export default defineConfig({
     vue(),
     cssInjectedByJs(),
   ],
+  server: {
+    port: 8080,
+    proxy: {
+      // 代理所有以 /h5 开头的请求
+      "/h5": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

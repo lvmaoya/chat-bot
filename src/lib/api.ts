@@ -2,17 +2,15 @@ import { SESSION_ID, USER_ID } from "./config";
 import { v4 as uuidv4 } from 'uuid';
 
 
-export async function handlePostRequestWithEventStream(url: string | URL, data: String, callback: Function) {
-    let userId = localStorage.getItem(USER_ID);
-    if (!userId) {
-        userId = uuidv4();
-        localStorage.setItem(USER_ID, userId!);
+export async function handlePostRequestWithEventStream(url: string | URL, data: string, callback: Function) {
+    let sessionId = sessionStorage.getItem(SESSION_ID);
+    if (!sessionId) {
+        sessionId = uuidv4();
+        sessionStorage.setItem(SESSION_ID, sessionId);
     }
     const body = {
-        sessionId: sessionStorage.getItem(SESSION_ID),
-        prompt: data,
-        referer: window.location.href,
-        clientId: userId
+        chatId: sessionId,
+        message: data,
     };
     let response;
     try {
@@ -53,7 +51,7 @@ export async function handlePostRequestWithEventStream(url: string | URL, data: 
 
         }
     }
-    sessionStorage.setItem(SESSION_ID, chatSessionId);
+   sessionStorage.setItem(SESSION_ID, chatSessionId);
     callback(ReceiveState.complete)
 }
 function defaultProcessChunk(chunks: string) {
@@ -63,7 +61,7 @@ function defaultProcessChunk(chunks: string) {
         let data: any = chunk.split('HTTP_STATUS/200\ndata:')[1];
         try {
             data = JSON.parse(data);
-            sessionId = data.output.session_id;
+            sessionId = data.output?.session_id || data.output?.chatId || data.output?.chat_id || '';
             result += data.output.text || '';
         } catch (e) {
             throw (e);
