@@ -16,7 +16,7 @@ const botName = 'Lvmaoya';
 
 <template>
   <!-- 开发预览用的示例壳：直接使用库组件 -->
-  <ChatWidget :bubble="true" :endpointUrl="endpointUrl" :greetings="greetings" :questions="questions" :botName="botName" />
+  <ChatWidget :endpointUrl="endpointUrl" :greetings="greetings" :questions="questions" :botName="botName" />
 </template>
 
 <style>

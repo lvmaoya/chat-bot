@@ -8,7 +8,6 @@ export type ChatWidgetProps = {
   endpointUrl?: string;
   greetings?: string[];
   questions?: string[];
-  bubble?: boolean;
   botName?: string;
 };
 

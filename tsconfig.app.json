@@ -11,6 +11,6 @@
       "@/*": ["./src/*"]
     },
     "moduleResolution": "Bundler",
-    "allowImportingTs": true
+    "allowImportingTsExtensions": true
   }
 }

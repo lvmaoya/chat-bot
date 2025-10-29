@@ -1,4 +1,3 @@
-export const USER_ID = "ud";
 export const HISTORY = 'hy';
 export const SESSION_ID = 'sid';
 export const LAST_CONVERSATION_TIME = 'lct' // check history

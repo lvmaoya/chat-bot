@@ -1,36 +1,43 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeMount, ref, watch } from 'vue';
-import { refreshIcon, closeIcon } from '../icons/svgIcons.ts';
-import { handlePostRequestWithEventStream, ReceiveState } from '../api.ts';
-import { formatLocalTime } from "../utils.ts";
+import { refreshIcon, closeIcon } from '../icons/svgIcons';
+import { handlePostRequestWithEventStream, ReceiveState } from '../api';
+import { formatLocalTime } from "../utils";
 import Loading from './Loading.vue';
 import MarkdownIt from "markdown-it";
-import { HISTORY, KEEP_STORAGE_SIZE, LAST_CONVERSATION_TIME, MAX_STORAGE_SIZE, MAX_TIME_INTERVAL, SESSION_ID } from '../config.ts';
-
-const props = defineProps<{
-  endpointUrl?: string;
-  greetings?: string[];
-  questions?: string[];
-  bubble?: boolean;
-  botName?: string;
-}>();
-
+import { HISTORY, KEEP_STORAGE_SIZE, LAST_CONVERSATION_TIME, MAX_STORAGE_SIZE, MAX_TIME_INTERVAL, SESSION_ID } from '../config';
 enum Role {
   user = 'user',
   assistant = 'assistant',
   system = 'system'
 }
+const props = defineProps({
+  endpointUrl: {
+    type: String,
+    required: true,
+  },
+  botName: {
+    type: String,
+    default: 'Lvmaoya',
+  },
+  greetings: {
+    type: Array,
+    default: () => ['Hi, there! {{botName}} is at your service! How can I assist you today?'],
+  },
+  questions: {
+    type: Array<string>,
+    default: () => [],
+  },
+});
 
-const bubbleEnabled = computed(() => props.bubble !== false);
-const isBotContainerVisible = ref(!bubbleEnabled.value ? true : false);
+const isBotContainerVisible = ref(false);
 const onBubbleClick = () => {
-  if (bubbleEnabled.value) isBotContainerVisible.value = true;
+  isBotContainerVisible.value = true;
 }
 
 const inputValue = ref('');
 const isLoading = ref(false);
 
-const endpoint = computed(() => props.endpointUrl ?? "http://webchat-bot-t9rx.fcv3.1486648470098031.cn-hangzhou.fc.devsapp.net/chat");
 
 const receiver = (state: ReceiveState, value: any) => {
   switch (state) {
@@ -67,19 +74,11 @@ const handleSubmit = async () => {
   isLoading.value = true;
   addMessage(Role.user, inputValue.value, Date.now());
   addMessage(Role.assistant, '', Date.now());
-  handlePostRequestWithEventStream(endpoint.value, inputValue.value, receiver);
+  handlePostRequestWithEventStream(props.endpointUrl, inputValue.value, receiver);
 };
 
 const chatMessages = ref<Array<{ role: Role, message: string, time: number }>>([]);
-const botName = computed(() => props.botName ?? 'Lvmaoya');
-const greetingMessage = computed(() => props.greetings ?? ['Hi, there! Lvmaoya is at your service! How can I assist you today?']);
-const questionsPrompt = computed(() => props.questions ?? [
-  "What is the capital of France",
-  "Who is the most handsome person in the world",
-  "Please share a story with me",
-  "Tell me a joke",
-  "Introduce yourself",
-]);
+
 
 const scrollContainer = ref<HTMLElement | null>(null);
 const scrollToBottom = () => {
@@ -90,12 +89,17 @@ const scrollToBottom = () => {
 const onCloseDialogClick = () => {
   isBotContainerVisible.value = false;
 };
-const markdown = new MarkdownIt();
+const markdown = new MarkdownIt({
+  linkify: true,
+  breaks: true,
+});
 
 const onPromptClick = (value: string) => {
   inputValue.value = value;
   handleSubmit();
 };
+
+// 刷新聊天记录
 const onRefreshClick = () => {
   if (isLoading.value) return;
   chatMessages.value.length = 0;
@@ -103,6 +107,8 @@ const onRefreshClick = () => {
   localStorage.removeItem(HISTORY);
   localStorage.removeItem(LAST_CONVERSATION_TIME);
 };
+
+// 保存聊天记录
 const setHistory = () => {
   let historyList = [...chatMessages.value];
   if (historyList.length > MAX_STORAGE_SIZE) {
@@ -111,6 +117,7 @@ const setHistory = () => {
   localStorage.setItem(HISTORY, JSON.stringify(historyList));
   localStorage.setItem(LAST_CONVERSATION_TIME, new Date().getTime().toString());
 };
+// 从本地存储获取聊天记录
 const getHistory = () => {
   let lastConversationTime = localStorage.getItem(LAST_CONVERSATION_TIME);
   const currentTime = new Date().getTime();
@@ -135,7 +142,7 @@ watch(chatMessages, () => {
 
 <template>
   <div>
-    <div v-if="bubbleEnabled" class="bot-trigger" @click="onBubbleClick" :class="{ 'hidden': isBotContainerVisible }">
+    <div class="bot-trigger" @click="onBubbleClick" :class="{ 'hidden': isBotContainerVisible }">
       <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5423" width="35" height="35">
         <path
           d="M240 658.08h220.784l55.744 65.04 55.744-65.04h220.768V272H240v386.08z m-48 32V240a16 16 0 0 1 16-16h617.04a16 16 0 0 1 16 16v450.08a16 16 0 0 1-16 16H594.336l-65.664 76.64a16 16 0 0 1-24.304 0l-65.664-76.64H208a16 16 0 0 1-16-16zM366.256 498.56a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z m150.272 0a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z m150.24 0a33.488 33.488 0 1 1 0-66.992 33.488 33.488 0 0 1 0 66.992z"
@@ -146,7 +153,7 @@ watch(chatMessages, () => {
       :class="{ 'bot-containner-show': isBotContainerVisible, 'bot-mobile-container': isMobile }">
       <div class="bot-header">
         <div class="logo">
-          <span>{{ botName }}</span>
+          <span>{{ props.botName }}</span>
         </div>
         <div class="toolbar">
           <button v-html="refreshIcon" @click="onRefreshClick"></button>
@@ -154,17 +161,17 @@ watch(chatMessages, () => {
         </div>
       </div>
       <div class="bot-content" ref="scrollContainer">
-        <div class="message-item" v-for="item in greetingMessage">
+        <div class="message-item" v-for="item in props.greetings">
           <div class="message-assistant">
             <div class="content">{{ item }}</div>
           </div>
         </div>
-        <div class="message-item" v-if="questionsPrompt.length">
+        <div class="message-item" v-if="props.questions.length">
           <div class="message-assistant">
             <div class="content">
               <p>Questions and Answers:</p>
               <ul>
-                <li v-for="item in questionsPrompt" @click="onPromptClick(item)">
+                <li v-for="item in props.questions" @click="onPromptClick(item)">
                   <a href="javascript:;">{{ item }}</a>
                 </li>
               </ul>

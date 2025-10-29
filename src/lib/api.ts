@@ -1,4 +1,4 @@
-import { SESSION_ID, USER_ID } from "./config";
+import { SESSION_ID } from "./config";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -42,9 +42,11 @@ export async function handlePostRequestWithEventStream(url: string | URL, data: 
         const content = textDecoder.decode(value);
         if (content) {
             try {
-                const [text, sessionId] = defaultProcessChunk(content);
-                chatSessionId = sessionId
-                callback(ReceiveState.update, text)
+                const { text, sessionId, isError } = defaultProcessChunk(content);
+                if (sessionId) chatSessionId = sessionId;
+                if (text) {
+                    callback(isError ? ReceiveState.error : ReceiveState.update, text);
+                }
             } catch (error) {
                 callback(ReceiveState.error, "Failed to parse response.")
             }
@@ -54,20 +56,48 @@ export async function handlePostRequestWithEventStream(url: string | URL, data: 
    sessionStorage.setItem(SESSION_ID, chatSessionId);
     callback(ReceiveState.complete)
 }
-function defaultProcessChunk(chunks: string) {
+function defaultProcessChunk(chunks: string): { text: string; sessionId: string; isError: boolean } {
     let result = '';
     let sessionId = '';
-    chunks.split("\nid").forEach(chunk => {
-        let data: any = chunk.split('HTTP_STATUS/200\ndata:')[1];
-        try {
-            data = JSON.parse(data);
-            sessionId = data.output?.session_id || data.output?.chatId || data.output?.chat_id || '';
-            result += data.output.text || '';
-        } catch (e) {
-            throw (e);
+    let isError = false;
+
+    // Split by lines and parse simple SSE format:
+    // event:message\n data:...\n [data:...] ...
+    // event:end\n data:<chatId>
+    const lines = chunks.split('\n');
+    let currentEvent: 'message' | 'end' | 'error' | null = null;
+    const decodeEscapes = (s: string) => s.replace(/\\n/g, '\n');
+
+    for (let i = 0; i < lines.length; i++) {
+        const lineRaw = lines[i] ?? '';
+        const line = lineRaw; // preserve trailing spaces and literal escape sequences
+
+        if (line.startsWith('event:')) {
+            const evt = line.slice('event:'.length).trim();
+            if (evt === 'message') currentEvent = 'message';
+            else if (evt === 'end') currentEvent = 'end';
+            else if (evt === 'error') currentEvent = 'error';
+            else currentEvent = null;
+            continue;
         }
-    });
-    return [result, sessionId];
+
+        if (line.startsWith('data:')) {
+            const data = line.slice('data:'.length); // do not trim; preserve spaces and escapes
+            if (currentEvent === 'message') {
+                // Append content; empty data lines become newline; convert literal \n to real newline
+                if (data.length === 0) result += '\n';
+                else result += decodeEscapes(data);
+            } else if (currentEvent === 'end') {
+                sessionId = data.trim();
+            } else if (currentEvent === 'error') {
+                isError = true;
+                if (data.length === 0) result += '\n';
+                else result += decodeEscapes(data);
+            }
+        }
+    }
+
+    return { text: result, sessionId, isError };
 }
 
 
