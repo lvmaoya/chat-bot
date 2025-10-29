@@ -268,8 +268,9 @@ const autoResize = (e: any) => {
       </div>
       <div class="bot-input">
         <textarea
+          rows="1"
           v-model="inputValue"
-          @keyup.enter="handleSubmit"
+          @keydown.enter.exact.prevent="handleSubmit"
           placeholder="Please enter your questions"
           @input="autoResize"
         />
