@@ -137,7 +137,7 @@ const isMobile = ref(false);
 
 watch(chatMessages, () => {
   nextTick(() => scrollToBottom());
-});
+}, { deep: true });
 </script>
 
 <template>
@@ -185,7 +185,9 @@ watch(chatMessages, () => {
             v-if="item.role === Role.user || item.role === Role.assistant">
             <div class="content" v-if="item.message" v-html="markdown.render(item.message)"></div>
             <div class="content" v-else>
-              <Loading></Loading>
+              <p>
+                <Loading></Loading>
+              </p>
             </div>
           </div>
           <div :class="{ 'message-system': item.role === Role.system }" v-else-if="item.role === Role.system && item.message">
@@ -212,18 +214,18 @@ watch(chatMessages, () => {
 .bot-trigger.hidden { display: none !important; }
 
 .bot-trigger {
-  position: fixed; width: 50px; height: 40px; border-radius: 4px; background-color: #eb9402; bottom: 40px; right: 40px;
+  position: fixed; width: 50px; height: 40px; border-radius: 4px; background-color: #000000f2; bottom: 40px; right: 40px;
   transition: 0.3s; cursor: pointer; z-index: 999999; display: flex; align-items: center; justify-content: center;
 }
-.bot-trigger:hover { background-color: #ffb432; }
+.bot-trigger:hover { background-color: #000000ab; }
 .bot-trigger:active { transform: scale(0.9); }
 
 .bot-containner {
   width: 435px; height: 80vh; max-height: 712px; position: fixed; bottom: 24px; right: 24px; box-shadow: 0 1px 8px 0 #47474729;
-  color: #171a20; border-radius: 16px; overflow: hidden; opacity: 0.1; transform: translateY(120%); transition: all .5s; z-index: 9999999;
+  color: #333; border-radius: 16px; overflow: hidden; opacity: 0.1; transform: translateY(120%); transition: all .5s; z-index: 9999999;
   display: flex; flex-direction: column; box-sizing: border-box; background-color: white;
 }
-.bot-containner a { color: #eb9402; text-decoration: none; outline: none; }
+.bot-containner a { color: #333; text-decoration: none; outline: none; }
 .bot-containner img { border: 0; }
 
 .bot-containner-show { opacity: 1; transform: translateY(0%); transition: opacity .5s, transform .5s; }
@@ -243,7 +245,7 @@ watch(chatMessages, () => {
 .bot-content { flex: 1; overflow-y: scroll; padding-left: 20px; padding-right: 14px; }
 .bot-content .message-item { display: flex; flex-direction: column; padding: 8px 0px; }
 .bot-content .message-item>div { display: flex; gap: 10px; }
-.bot-content .message-item.message-question .content li{ line-height: 2 !important; list-style: disc;color: #eb9402; }
+.bot-content .message-item.message-question .content li{ line-height: 2 !important; list-style: disc;color: #333; }
 .bot-content .message-item .content { width: fit-content; background-color: #f4f4f4; padding: 0 14px; font-size: 14px; line-height: 22px; }
 
 .bot-content::-webkit-scrollbar { -webkit-appearance: none; width: 4px; height: 4px; }

@@ -17,7 +17,8 @@
 
 .loading {
     display: block;
-    font-size: 0;
+    font-size: 14px;
+    line-height: 2;
     color: #999;
 }
 
@@ -31,11 +32,6 @@
     background-color: currentColor;
     border: 0 solid currentColor;
 }
-
-.loading {
-    line-height: 0;
-}
-
 .loading>div:nth-child(1) {
     animation-delay: -200ms;
 }
