@@ -163,6 +163,11 @@ watch(
   },
   { deep: true }
 );
+const autoResize = (e: any) => {
+  const textarea = e.target;
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+};
 </script>
 
 <template>
@@ -262,11 +267,11 @@ watch(
         </div>
       </div>
       <div class="bot-input">
-        <input
-          type="text"
+        <textarea
           v-model="inputValue"
           @keyup.enter="handleSubmit"
-          placeholder="Please enter your questions" 
+          placeholder="Please enter your questions"
+          @input="autoResize"
         />
         <button @click="handleSubmit">
           <svg
@@ -292,12 +297,11 @@ watch(
   </div>
 </template>
 
-<style scoped>
-.bot-trigger.hidden {
-  display: none !important;
-}
-
+<style scoped lang="scss">
 .bot-trigger {
+  &.hidden {
+    display: none !important;
+  }
   position: fixed;
   width: 50px;
   height: 40px;
@@ -311,12 +315,13 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.bot-trigger:hover {
-  background-color: #000000ab;
-}
-.bot-trigger:active {
-  transform: scale(0.9);
+
+  &:hover {
+    background-color: #000000ab;
+  }
+  &:active {
+    transform: scale(0.9);
+  }
 }
 
 .bot-containner {
@@ -338,14 +343,203 @@ watch(
   flex-direction: column;
   box-sizing: border-box;
   background-color: white;
-}
-.bot-containner a {
-  color: #333;
-  text-decoration: none;
-  outline: none;
-}
-.bot-containner img {
-  border: 0;
+  a {
+    color: #333;
+    text-decoration: none;
+    outline: none;
+  }
+  img {
+    border: 0;
+  }
+
+  .bot-header {
+    height: 70px;
+    display: flex;
+    padding-left: 20px;
+    padding-right: 10px;
+    align-items: center;
+    justify-content: space-between;
+    .logo {
+      line-height: 0;
+      display: flex;
+      align-items: center;
+      span {
+        font-weight: 600;
+      }
+    }
+
+    .toolbar {
+      display: flex;
+
+      svg {
+        font-size: 18px;
+        fill: #333;
+      }
+      button {
+        width: 2.5rem;
+        height: 2.5rem;
+        background-color: transparent;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-color: transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+
+        &:first-child {
+          margin-right: 4px;
+        }
+        &:hover {
+          background-color: #c0c0c029;
+        }
+        &:active {
+          transform: scale(0.9);
+        }
+      }
+    }
+  }
+
+  .bot-content {
+    flex: 1;
+    overflow-y: scroll;
+    padding-left: 20px;
+    padding-right: 14px;
+    .message-item {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0px;
+
+      & > div {
+        display: flex;
+        gap: 10px;
+      }
+      &.message-question {
+        .content li {
+          line-height: 2 !important;
+          list-style: disc;
+          color: #333;
+        }
+      }
+      .content {
+        width: fit-content;
+        background-color: #f4f4f4;
+        padding: 0 14px;
+        font-size: 14px;
+        line-height: 22px;
+      }
+    }
+
+    &::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 4px;
+      height: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 0;
+    }
+    &::-webkit-scrollbar-thumb {
+      cursor: pointer;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.1);
+      transition: color 0.2s ease;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .message-user {
+      width: 90%;
+      margin-left: auto;
+      justify-content: end;
+
+      .content {
+        border-radius: 0.5rem 0 0.5rem 0.5rem;
+        background-color: #ffa305;
+        color: white;
+      }
+      + div {
+        font-size: 12px;
+        justify-content: end;
+        margin-right: 6px;
+        margin-top: 3px;
+        color: #999;
+      }
+    }
+
+    .message-assistant {
+      width: 90%;
+      margin-right: auto;
+
+      .content {
+        border-radius: 0 0.5rem 0.5rem 0.5rem;
+      }
+      + div {
+        font-size: 12px;
+        justify-self: start;
+        margin-left: 6px;
+        margin-top: 3px;
+        color: #999;
+      }
+    }
+  }
+
+  .bot-input {
+    width: 100%;
+    display: flex;
+    box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2);
+    box-sizing: border-box;
+    padding-left: 18px;
+    padding-right: 10px;
+
+    textarea {
+      flex: 1;
+      min-height: 60px;
+      border: none;
+      margin: 10px 0;
+      padding: 0;
+      outline: 0;
+      background-color: transparent;
+      font-size: 14px;
+      resize: none;
+      max-height: 100px;
+
+      &::placeholder {
+        color: #999;
+      }
+      &:focus {
+        border: none;
+        outline: none;
+        box-shadow: none;
+      }
+      &::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 2px;
+        height: 2px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 0;
+      }
+      &::-webkit-scrollbar-thumb {
+        cursor: pointer;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.1);
+        transition: color 0.2s ease;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    button {
+      height: 100%;
+      border: none;
+      min-width: 60px;
+      background-color: transparent;
+    }
+  }
 }
 
 .bot-containner-show {
@@ -359,164 +553,5 @@ watch(
   bottom: 0;
   width: 100%;
   border-radius: 16px 16px 0 0;
-}
-
-.bot-header {
-  height: 70px;
-  display: flex;
-  padding-left: 20px;
-  padding-right: 10px;
-  align-items: center;
-  justify-content: space-between;
-}
-.bot-header .logo {
-  line-height: 0;
-  display: flex;
-  align-items: center;
-}
-.bot-header .logo img {
-  width: 45px;
-  border-radius: 50%;
-}
-.bot-header .logo span {
-  font-weight: 600;
-}
-.bot-header .toolbar {
-  display: flex;
-}
-.bot-header .toolbar svg {
-  font-size: 18px;
-  fill: #333;
-}
-.bot-header .toolbar button {
-  width: 2.5rem;
-  height: 2.5rem;
-  background-color: transparent;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-color: transparent;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.bot-header .toolbar button:first-child {
-  margin-right: 4px;
-}
-.bot-header .toolbar button:hover {
-  background-color: #c0c0c029;
-}
-.bot-header .toolbar button:active {
-  transform: scale(0.9);
-}
-
-.bot-content {
-  flex: 1;
-  overflow-y: scroll;
-  padding-left: 20px;
-  padding-right: 14px;
-}
-.bot-content .message-item {
-  display: flex;
-  flex-direction: column;
-  padding: 8px 0px;
-}
-.bot-content .message-item > div {
-  display: flex;
-  gap: 10px;
-}
-.bot-content .message-item.message-question .content li {
-  line-height: 2 !important;
-  list-style: disc;
-  color: #333;
-}
-.bot-content .message-item .content {
-  width: fit-content;
-  background-color: #f4f4f4;
-  padding: 0 14px;
-  font-size: 14px;
-  line-height: 22px;
-}
-
-.bot-content::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 4px;
-  height: 4px;
-}
-.bot-content::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 0;
-}
-.bot-content::-webkit-scrollbar-thumb {
-  cursor: pointer;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.1);
-  transition: color 0.2s ease;
-}
-.bot-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.bot-content .message-user {
-  width: 90%;
-  margin-left: auto;
-  justify-content: end;
-}
-.bot-content .message-user .content {
-  border-radius: 0.5rem 0 0.5rem 0.5rem;
-  background-color: #ffa305;
-  color: white;
-}
-.bot-content .message-user + div {
-  font-size: 12px;
-  justify-content: end;
-  margin-right: 6px;
-  margin-top: 3px;
-  color: #999;
-}
-
-.bot-content .message-assistant {
-  width: 90%;
-  margin-right: auto;
-}
-.bot-content .message-assistant .content {
-  border-radius: 0 0.5rem 0.5rem 0.5rem;
-}
-.bot-content .message-assistant + div {
-  font-size: 12px;
-  justify-self: start;
-  margin-left: 6px;
-  margin-top: 3px;
-  color: #999;
-}
-
-.bot-input {
-  width: 100%;
-  display: flex;
-  height: 60px;
-  box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2);
-  box-sizing: border-box;
-  padding-left: 18px;
-  padding-right: 10px;
-}
-.bot-input input {
-  flex: 1;
-  border: none;
-  margin: 0;
-  padding: 0;
-  outline: 0;
-  background-color: transparent;
-  font-size: 14px;
-}
-.bot-input input:focus {
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-.bot-input button {
-  height: 100%;
-  border: none;
-  aspect-ratio: 1/1;
-  background-color: transparent;
 }
 </style>
