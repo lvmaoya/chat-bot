@@ -163,10 +163,12 @@ watch(chatMessages, () => {
       <div class="bot-content" ref="scrollContainer">
         <div class="message-item" v-for="item in props.greetings">
           <div class="message-assistant">
-            <div class="content">{{ item }}</div>
+            <div class="content">
+              <p>{{ item }}</p>
+            </div>
           </div>
         </div>
-        <div class="message-item" v-if="props.questions.length">
+        <div class="message-item message-question" v-if="props.questions.length">
           <div class="message-assistant">
             <div class="content">
               <p>Questions and Answers:</p>
@@ -206,7 +208,7 @@ watch(chatMessages, () => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .bot-trigger.hidden { display: none !important; }
 
 .bot-trigger {
@@ -222,8 +224,6 @@ watch(chatMessages, () => {
   display: flex; flex-direction: column; box-sizing: border-box; background-color: white;
 }
 .bot-containner a { color: #eb9402; text-decoration: none; outline: none; }
-.bot-containner ul, .bot-containner p, .bot-containner button { padding: 0; margin: 0; }
-.bot-containner li { list-style: none; }
 .bot-containner img { border: 0; }
 
 .bot-containner-show { opacity: 1; transform: translateY(0%); transition: opacity .5s, transform .5s; }
@@ -243,8 +243,8 @@ watch(chatMessages, () => {
 .bot-content { flex: 1; overflow-y: scroll; padding-left: 20px; padding-right: 14px; }
 .bot-content .message-item { display: flex; flex-direction: column; padding: 8px 0px; }
 .bot-content .message-item>div { display: flex; gap: 10px; }
-.bot-content .message-item:nth-child(2) .content { line-height: 2 !important; }
-.bot-content .message-item .content { width: fit-content; background-color: #f4f4f4; padding: 14px; font-size: 14px; line-height: 22px; }
+.bot-content .message-item.message-question .content li{ line-height: 2 !important; list-style: disc;color: #eb9402; }
+.bot-content .message-item .content { width: fit-content; background-color: #f4f4f4; padding: 0 14px; font-size: 14px; line-height: 22px; }
 
 .bot-content::-webkit-scrollbar { -webkit-appearance: none; width: 4px; height: 4px; }
 .bot-content::-webkit-scrollbar-track { background: transparent; border-radius: 0; }
@@ -252,8 +252,7 @@ watch(chatMessages, () => {
 .bot-content::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.5); }
 
 .bot-content .message-user { width: 90%; margin-left: auto; justify-content: end; }
-.bot-content .message-user .content { border-radius: 0.5rem 0 0.5rem 0.5rem; background-color: #ffa305; }
-.bot-content .message-user .content p { color: white; }
+.bot-content .message-user .content { border-radius: 0.5rem 0 0.5rem 0.5rem; background-color: #ffa305; color: white; }
 .bot-content .message-user+div { font-size: 12px; justify-content: end; margin-right: 6px; margin-top: 3px; color: #999; }
 
 .bot-content .message-assistant { width: 90%; margin-right: auto; }
