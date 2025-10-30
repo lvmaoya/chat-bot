@@ -352,25 +352,7 @@ const autoResize = (e: any) => {
   img {
     border: 0;
   }
-
   // 基于 Chrome UA 默认样式的局部基础标签规则
-  p { margin: 1em 0; }
-  h1 { font-weight: 600; font-size: 2em; margin: 0.67em 0; }
-  h2 { font-weight: 600; font-size: 1.5em; margin: 0.83em 0; }
-  h3 { font-weight: 600; font-size: 1.17em; margin: 1em 0; }
-  h4 { font-weight: 600; font-size: 1em; margin: 1.33em 0; }
-  h5 { font-weight: 600; font-size: 0.83em; margin: 1.67em 0; }
-  h6 { font-weight: 600; font-size: 0.67em; margin: 2.33em 0; }
-  ul, ol { margin: 1em 0; padding-left: 40px; }
-  li { display: list-item; }
-  blockquote { margin: 1em 40px; }
-  pre { margin: 1em 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-  code, kbd, samp { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-  table { border-collapse: separate; border-spacing: 2px; }
-  th { font-weight: 600; }
-  td, th { padding: 0; }
-  hr { display: block; height: 1px; border: 0; border-top: 1px solid #dcdcdc; margin: 1em 0; }
-  button, textarea, input { font: inherit; }
 
   .bot-header {
     height: 70px;
@@ -398,6 +380,7 @@ const autoResize = (e: any) => {
       button {
         width: 2.5rem;
         height: 2.5rem;
+        padding: 0;
         background-color: transparent;
         border-radius: 50%;
         display: flex;
@@ -477,7 +460,9 @@ const autoResize = (e: any) => {
       .content {
         border-radius: 0.5rem 0 0.5rem 0.5rem;
         background-color: #ffa305;
-        color: white;
+        :deep(p) {
+          color: white;
+        }
       }
       + div {
         font-size: 12px;
@@ -619,7 +604,7 @@ const autoResize = (e: any) => {
     padding: 0;
     font-size: 12px;
     line-height: 22px;
-    color: #fff;  
+    color: #fff;
   }
 }
 </style>
