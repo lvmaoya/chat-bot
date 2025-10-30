@@ -75,74 +75,98 @@ export async function handlePostRequestWithEventStream(url: string | URL, data: 
     let reader: ReadableStreamDefaultReader<Uint8Array> = response.body.getReader();
     const textDecoder = new TextDecoder();
     let chatSessionId = '';
+    // Maintain a buffer to avoid cutting lines across chunks
+    let sseBuffer = '';
+    let currentEvent: 'message' | 'end' | 'error' | null = null;
+    const decodeEscapes = (s: string) => s.replace(/\\n/g, '\n');
+
     while (true) {
         const { value, done } = await reader.read();
+        if (done) break;
 
-        if (done) {
-            break;
-        }
+        const content = textDecoder.decode(value, { stream: true });
+        if (!content) continue;
 
-        const content = textDecoder.decode(value);
-        if (content) {
-            try {
-                const { text, sessionId, isError } = defaultProcessChunk(content);
-                if (sessionId) chatSessionId = sessionId;
-                if (text) {
-                    callback(isError ? ReceiveState.error : ReceiveState.update, text);
-                }
-            } catch (error) {
-                callback(ReceiveState.error, "Failed to parse response.")
+        // Normalize CRLF and append to buffer
+        sseBuffer += content.replace(/\r\n/g, '\n');
+
+        // Process complete lines; keep the last partial line in buffer
+        const lines = sseBuffer.split('\n');
+        sseBuffer = lines.pop() ?? '';
+
+        let textAcc = '';
+        let isErrorAcc = false;
+
+        for (const lineRaw of lines) {
+            const line = lineRaw; // preserve spaces and literal escapes
+
+            if (line.startsWith('event:')) {
+                const evt = line.slice('event:'.length).trim();
+                if (evt === 'message') currentEvent = 'message';
+                else if (evt === 'end') currentEvent = 'end';
+                else if (evt === 'error') currentEvent = 'error';
+                else currentEvent = null;
+                continue;
             }
 
+            if (line.startsWith('data:')) {
+                const data = line.slice('data:'.length); // do not trim; preserve spaces and escapes
+                if (currentEvent === 'message') {
+                    // Append token content; empty data lines become newline
+                    if (data.length === 0) textAcc += '\n';
+                    else textAcc += decodeEscapes(data);
+                } else if (currentEvent === 'end') {
+                    chatSessionId = data.trim();
+                } else if (currentEvent === 'error') {
+                    isErrorAcc = true;
+                    if (data.length === 0) textAcc += '\n';
+                    else textAcc += decodeEscapes(data);
+                }
+            }
+            // Ignore other lines; they might be comments or unsupported fields
+        }
+
+        if (textAcc) {
+            callback(isErrorAcc ? ReceiveState.error : ReceiveState.update, textAcc);
+        }
+    }
+    // Flush any remaining buffer lines after stream ends
+    if (sseBuffer) {
+        const lines = sseBuffer.split('\n');
+        let textAcc = '';
+        let isErrorAcc = false;
+        const decodeEscapes = (s: string) => s.replace(/\\n/g, '\n');
+        for (const lineRaw of lines) {
+            const line = lineRaw;
+            if (line.startsWith('event:')) {
+                const evt = line.slice('event:'.length).trim();
+                if (evt === 'message') currentEvent = 'message';
+                else if (evt === 'end') currentEvent = 'end';
+                else if (evt === 'error') currentEvent = 'error';
+                else currentEvent = null;
+                continue;
+            }
+            if (line.startsWith('data:')) {
+                const data = line.slice('data:'.length);
+                if (currentEvent === 'message') {
+                    if (data.length === 0) textAcc += '\n';
+                    else textAcc += decodeEscapes(data);
+                } else if (currentEvent === 'end') {
+                    chatSessionId = data.trim();
+                } else if (currentEvent === 'error') {
+                    isErrorAcc = true;
+                    if (data.length === 0) textAcc += '\n';
+                    else textAcc += decodeEscapes(data);
+                }
+            }
+        }
+        if (textAcc) {
+            callback(isErrorAcc ? ReceiveState.error : ReceiveState.update, textAcc);
         }
     }
     sessionStorage.setItem(SESSION_ID, chatSessionId);
     callback(ReceiveState.complete)
 }
-function defaultProcessChunk(chunks: string): { text: string; sessionId: string; isError: boolean } {
-    let result = '';
-    let sessionId = '';
-    let isError = false;
-
-    // Split by lines and parse simple SSE format:
-    // event:message\n data:...\n [data:...] ...
-    // event:end\n data:<chatId>
-    const lines = chunks.split('\n');
-    let currentEvent: 'message' | 'end' | 'error' | null = null;
-    const decodeEscapes = (s: string) => s.replace(/\\n/g, '\n');
-
-    for (let i = 0; i < lines.length; i++) {
-        const lineRaw = lines[i] ?? '';
-        const line = lineRaw; // preserve trailing spaces and literal escape sequences
-
-        if (line.startsWith('event:')) {
-            const evt = line.slice('event:'.length).trim();
-            if (evt === 'message') currentEvent = 'message';
-            else if (evt === 'end') currentEvent = 'end';
-            else if (evt === 'error') currentEvent = 'error';
-            else currentEvent = null;
-            continue;
-        }
-
-        if (line.startsWith('data:')) {
-            const data = line.slice('data:'.length); // do not trim; preserve spaces and escapes
-            if (currentEvent === 'message') {
-                // Append content; empty data lines become newline; convert literal \n to real newline
-                if (data.length === 0) result += '\n';
-                else result += decodeEscapes(data);
-            } else if (currentEvent === 'end') {
-                sessionId = data.trim();
-            } else if (currentEvent === 'error') {
-                isError = true;
-                if (data.length === 0) result += '\n';
-                else result += decodeEscapes(data);
-            }
-        }
-    }
-
-    return { text: result, sessionId, isError };
-}
-
 
 export enum ReceiveState {
     update,

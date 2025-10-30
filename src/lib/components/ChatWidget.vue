@@ -82,12 +82,12 @@ const handleSubmit = async () => {
   isLoading.value = true;
   addMessage(Role.user, inputValue.value, Date.now());
   addMessage(Role.assistant, "", Date.now());
-  clearInputValue();
   handlePostRequestWithEventStream(
     props.endpointUrl,
     inputValue.value,
     receiver
   );
+  clearInputValue();
 };
 
 const chatMessages = ref<Array<{ role: Role; message: string; time: number }>>(
@@ -252,7 +252,7 @@ const autoResize = (e: any) => {
               v-if="item.message"
               v-html="markdown.render(item.message)"
             ></div>
-            <div class="content" v-else>
+            <div class="content" v-else-if="isLoading">
               <p>
                 <Loading></Loading>
               </p>
@@ -264,7 +264,7 @@ const autoResize = (e: any) => {
           >
             <div v-html="item.message"></div>
           </div>
-          <div>{{ formatLocalTime(item.time) }}</div>
+          <div v-if="item.message">{{ formatLocalTime(item.time) }}</div>
         </div>
       </div>
       <div class="bot-input">
@@ -275,8 +275,23 @@ const autoResize = (e: any) => {
           placeholder="Please enter your questions"
           @input="autoResize"
         />
-        <button @click="handleSubmit" :class="{'disabled': !(inputValue && inputValue.trim() !== '' && !isLoading)}">
-          <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="icon"><path d="M8.99992 16V6.41407L5.70696 9.70704C5.31643 10.0976 4.68342 10.0976 4.29289 9.70704C3.90237 9.31652 3.90237 8.6835 4.29289 8.29298L9.29289 3.29298L9.36907 3.22462C9.76184 2.90427 10.3408 2.92686 10.707 3.29298L15.707 8.29298L15.7753 8.36915C16.0957 8.76192 16.0731 9.34092 15.707 9.70704C15.3408 10.0732 14.7618 10.0958 14.3691 9.7754L14.2929 9.70704L10.9999 6.41407V16C10.9999 16.5523 10.5522 17 9.99992 17C9.44764 17 8.99992 16.5523 8.99992 16Z"></path></svg>
+        <button
+          @click="handleSubmit"
+          :class="{
+            disabled: !(inputValue && inputValue.trim() !== '' && !isLoading),
+          }"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon"
+          >
+            <path
+              d="M8.99992 16V6.41407L5.70696 9.70704C5.31643 10.0976 4.68342 10.0976 4.29289 9.70704C3.90237 9.31652 3.90237 8.6835 4.29289 8.29298L9.29289 3.29298L9.36907 3.22462C9.76184 2.90427 10.3408 2.92686 10.707 3.29298L15.707 8.29298L15.7753 8.36915C16.0957 8.76192 16.0731 9.34092 15.707 9.70704C15.3408 10.0732 14.7618 10.0958 14.3691 9.7754L14.2929 9.70704L10.9999 6.41407V16C10.9999 16.5523 10.5522 17 9.99992 17C9.44764 17 8.99992 16.5523 8.99992 16Z"
+            ></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -519,8 +534,8 @@ const autoResize = (e: any) => {
     }
 
     button {
-      width: 36px;
-      height: 36px;
+      width: 2.5rem;
+      height: 2.5rem;
       padding: 0;
       margin: 0 12px;
       display: flex;
@@ -555,5 +570,37 @@ const autoResize = (e: any) => {
   bottom: 0;
   width: 100%;
   border-radius: 16px 16px 0 0;
+}
+:deep(pre) {
+  background-color: #333;
+  padding: 12px;
+  border-radius: 8px;
+  max-width: 350px;
+  overflow-x: auto;
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 4px;
+    height: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 0;
+  }
+  &::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.1);
+    transition: color 0.2s ease;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 12px;
+    line-height: 22px;
+    color: #fff;  
+  }
 }
 </style>
