@@ -48,13 +48,13 @@ const inputValue = ref("");
 const isLoading = ref(false);
 
 const receiver = (state: ReceiveState, value: any) => {
+  console.log(state, value);
   switch (state) {
     case ReceiveState.complete:
       isLoading.value = false;
       setHistory();
       break;
     case ReceiveState.update:
-      clearInputValue();
       chatMessages.value[chatMessages.value.length - 1].message += value;
       break;
     case ReceiveState.error:
@@ -82,6 +82,7 @@ const handleSubmit = async () => {
   isLoading.value = true;
   addMessage(Role.user, inputValue.value, Date.now());
   addMessage(Role.assistant, "", Date.now());
+  clearInputValue();
   handlePostRequestWithEventStream(
     props.endpointUrl,
     inputValue.value,
@@ -274,24 +275,8 @@ const autoResize = (e: any) => {
           placeholder="Please enter your questions"
           @input="autoResize"
         />
-        <button @click="handleSubmit">
-          <svg
-            :style="{
-              fill:
-                inputValue && inputValue.trim() !== '' && !isLoading
-                  ? '#666'
-                  : '#999',
-            }"
-            width="21"
-            height="21"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M392.021 925.013a34.133 34.133 0 0 1-34.133-34.133V579.243a34.002 34.002 0 0 1 12.63-26.454l276.48-224.085a34.1 34.1 0 0 1 43.007 52.907l-263.85 213.845v192.853l82.944-110.592c10.069-13.482 28.672-17.578 43.52-9.557l137.557 73.728L853.333 156.16c3.243-11.435-3.413-18.603-6.485-21.163-3.072-2.56-11.093-7.85-21.845-2.901L206.336 422.4l80.213 46.08c16.384 9.387 22.016 30.208 12.63 46.592s-30.208 22.016-46.592 12.63L115.54 449.023a33.98 33.98 0 0 1-17.066-31.061c0.512-12.8 8.021-24.064 19.626-29.526L795.99 70.315c31.744-14.848 68.096-10.07 94.891 12.629a87.79 87.79 0 0 1 28.16 91.477L744.277 801.28a34.082 34.082 0 0 1-48.981 20.821L546.133 742.06 419.328 911.36c-6.656 8.704-16.896 13.653-27.307 13.653z"
-            ></path>
-          </svg>
+        <button @click="handleSubmit" :class="{'disabled': !(inputValue && inputValue.trim() !== '' && !isLoading)}">
+          <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" class="icon"><path d="M8.99992 16V6.41407L5.70696 9.70704C5.31643 10.0976 4.68342 10.0976 4.29289 9.70704C3.90237 9.31652 3.90237 8.6835 4.29289 8.29298L9.29289 3.29298L9.36907 3.22462C9.76184 2.90427 10.3408 2.92686 10.707 3.29298L15.707 8.29298L15.7753 8.36915C16.0957 8.76192 16.0731 9.34092 15.707 9.70704C15.3408 10.0732 14.7618 10.0958 14.3691 9.7754L14.2929 9.70704L10.9999 6.41407V16C10.9999 16.5523 10.5522 17 9.99992 17C9.44764 17 8.99992 16.5523 8.99992 16Z"></path></svg>
         </button>
       </div>
     </div>
@@ -489,23 +474,22 @@ const autoResize = (e: any) => {
   .bot-input {
     width: 100%;
     display: flex;
+    align-items: center;
     box-shadow: 0 -1px 2px 0 rgba(201, 201, 201, 0.2);
     box-sizing: border-box;
-    padding-left: 18px;
-    padding-right: 10px;
-
+    padding: 8px 0;
     textarea {
       flex: 1;
       min-height: 60px;
       border: none;
-      margin: 10px 0;
-      padding: 0;
+      margin-left: 12px;
+      padding: 20px 0;
       outline: 0;
       background-color: transparent;
       font-size: 14px;
       resize: none;
       max-height: 100px;
-
+      box-sizing: border-box;
       &::placeholder {
         color: #999;
       }
@@ -535,10 +519,27 @@ const autoResize = (e: any) => {
     }
 
     button {
-      height: 100%;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      margin: 0 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
       border: none;
-      min-width: 60px;
-      background-color: transparent;
+      cursor: pointer;
+      background-color: #333;
+      svg {
+        fill: #fff;
+      }
+      &.disabled {
+        cursor: not-allowed;
+        background-color: #f4f4f4;
+        svg {
+          fill: #999;
+        }
+      }
     }
   }
 }

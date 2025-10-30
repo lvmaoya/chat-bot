@@ -2,7 +2,7 @@
 import ChatWidget from './lib/components/ChatWidget.vue';
 
 // 示例属性，可根据需要调整
-const endpointUrl = "http://localhost:8080/h5/chat/stream";
+const endpointUrl = "http://localhost:8080/h5/chat/strea1m";
 const greetings = ['Hi, there! Lvmaoya is at your service! How can I assist you today?'];
 const questions = [
   "What is the capital of France",
