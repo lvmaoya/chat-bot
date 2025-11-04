@@ -11,7 +11,7 @@ export default defineConfig({
     cssInjectedByJs(),
   ],
   server: {
-    port: 8080,
+    port: 3001,
     proxy: {
       // 代理所有以 /h5 开头的请求
       "/h5": {
