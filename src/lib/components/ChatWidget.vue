@@ -548,6 +548,7 @@ const autoResize = (e: any) => {
       outline: 0;
       background-color: transparent;
       font-size: 14px;
+      color: #333;
       resize: none;
       max-height: 100px;
       box-sizing: border-box;
