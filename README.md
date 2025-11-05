@@ -1,74 +1,27 @@
-# Lvmaoya 聊天机器人（可作为 npm 包使用）
+# Lvmaoya Chat Widget
 
-一个基于 Vue 3 的轻量级聊天组件，支持作为独立库集成到 Vue 项目、Nuxt 3 项目以及纯 HTML+JS 页面。
+一个可即插即用的聊天窗口组件，支持在 Vue 项目或纯 HTML 页面中集成，开箱即用地完成聊天展示、流式输出与历史存储。
 
 ## 功能特点
-- 轻量组件，一行代码集成聊天窗口
-- 会话历史保存与恢复（LocalStorage + SessionStorage）
-- Markdown 渲染，移动端适配
-- 预设问题快捷提示
-- 可配置后端聊天接口地址
+- 一行代码集成聊天窗口
+- 流式输出（SSE）与 Markdown 渲染
+- 会话与历史自动存储与恢复
+- 移动端适配与基础样式保障
 
-## 安装与构建
-
-- 开发依赖安装：
-```bash
-npm install
-# 或 pnpm install
-```
-
-- 本地开发：
-```bash
-npm run dev
-```
-
-- 构建库（生成 `dist/` 产物）：
-```bash
-npm run build
-```
-> 构建后将生成：`dist/chat-bot-widget.mjs`（ESM）、`dist/chat-bot-widget.umd.js`（UMD），以及样式 `dist/style.css`。
-
-## npm 发布准备
-
-当前仓库已配置为库模式输出，发布到 npm 的步骤如下：
-
-1. 登录 npm：
-```bash
-npm login
-```
-2. 确认包名是否可用（建议使用作用域包名，例如 `@lvmaoya/chat-bot`）：
-   - 将 `package.json` 的 `name` 改为你的包名
-   - 如使用作用域，首次发布需加：`npm publish --access public`
-3. 更新版本号：
-```bash
-npm version patch   # 或 minor / major
-```
-4. 构建并本地验证：
-```bash
-npm run build
-npm pack            # 生成 .tgz 包，本地新项目可安装测试
-```
-5. 发布：
-```bash
-npm publish --access public
-```
-
-## 安装（使用者侧）
-
-### Vue 3 项目
+## 安装
 
 ```bash
-npm i chat-bot
-# 或 npm i @lvmaoya/chat-bot （建议使用你最终的包名）
+npm i @lvmaoya/chat-bot
 ```
 
-- 作为插件全局注册：
+## 快速开始（Vue 3）
+
+- 全局注册：
 ```ts
 // main.ts
 import { createApp } from 'vue';
 import App from './App.vue';
-import ChatBot from 'chat-bot'; // 或 '@lvmaoya/chat-bot'
-import 'chat-bot/dist/style.css';
+import ChatBot from '@lvmaoya/chat-bot';
 
 const app = createApp(App);
 app.use(ChatBot); // 注册 <ChatWidget>
@@ -78,85 +31,115 @@ app.mount('#app');
 - 在页面中使用：
 ```vue
 <template>
-  <ChatWidget endpointUrl="https://your-api/chat" />
+  <ChatWidget
+    endpointUrl="https://your-api/chat/stream"
+    botName="Lvmaoya"
+    :greetings="['Hello! How can I help you?']"
+    :questions="['Tell me a joke', 'Introduce yourself']"
+  />
 </template>
 ```
 
 - 按需导入组件（不注册插件）：
 ```ts
-import { ChatWidget } from 'chat-bot';
+import { ChatWidget } from '@lvmaoya/chat-bot';
 ```
 
-- 可选属性：
-  - `endpointUrl?: string` 接口地址（默认内置 demo 地址）
-  - `greetings?: string[]` 欢迎语数组
-  - `questions?: string[]` 预设问题数组
-  - `bubble?: boolean` 是否显示右下角气泡按钮（默认 `true`）
+## 纯 HTML 页面集成
 
-### Nuxt 3 项目
-
-安装同上，然后创建客户端插件：
-```ts
-// plugins/chatbot.client.ts
-import { defineNuxtPlugin } from '#app';
-import ChatBot from 'chat-bot';
-import 'chat-bot/dist/style.css';
-
-export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.vueApp.use(ChatBot);
-});
-```
-在页面或组件中即可使用：
-```vue
-<template>
-  <ChatWidget endpointUrl="https://your-api/chat" />
-</template>
-```
-
-### 纯 HTML + JS 页面（CDN）
-
-在页面中引入 Vue 3 和 UMD 包：
+### 标准 UMD（需引入 Vue）
 ```html
 <div id="chatbot"></div>
-<link rel="stylesheet" href="https://unpkg.com/chat-bot/dist/style.css" />
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="https://unpkg.com/chat-bot/dist/chat-bot-widget.umd.js"></script>
+<script src="https://unpkg.com/@lvmaoya/chat-bot/dist/chat-bot-widget.umd.js"></script>
 <script>
   // UMD 全局名：ChatBotWidget
   ChatBotWidget.mount('#chatbot', {
-    endpointUrl: 'https://your-api/chat',
-    greetings: ['Hello! How can I help you today?'],
+    endpointUrl: 'https://your-api/chat/stream',
+    botName: 'Lvmaoya',
+    greetings: ['Hello!'],
     questions: ['Tell me a joke', 'Introduce yourself']
   });
 </script>
 ```
-> 注意：UMD 构建外部化了 Vue，因此必须先引入 Vue 3。
 
-## 项目结构概览
-```
-├── src/
-│   ├── App.vue               # 演示应用（本地开发预览）
-│   ├── lib/
-│   │   ├── ChatWidget.vue    # 可发布为 npm 的聊天组件
-│   │   └── index.ts          # 库入口（导出组件、插件、mount 方法）
-│   ├── api.ts                # 流式接口封装
-│   ├── assets/
-│   │   ├── main.css
-│   │   └── svgIcons.ts
-│   ├── config.ts
-│   ├── loading.vue
-│   └── utils.ts
+### Standalone UMD（无需引入 Vue）
+```html
+<div id="chatbot"></div>
+<script src="/dist/chat-bot-widget.standalone.umd.js"></script>
+<script>
+  ChatBotWidget.mount('#chatbot', {
+    endpointUrl: 'https://your-api/chat/stream',
+    botName: 'Lvmaoya'
+  });
+</script>
 ```
 
-## 可配置项（运行时）
-- `endpointUrl`：后端聊天接口地址（默认使用项目内示例地址）
-- `greetings`：欢迎语数组
-- `questions`：预设问题数组
-- `bubble`：是否显示右下角气泡按钮（默认显示）
+说明：Standalone 版本将 Vue 一并打包，体积更大但集成更简单；标准 UMD 版本需页面提前加载 Vue，体积更小。
+
+## 可选属性
+
+- `endpointUrl?: string` 后端流式接口地址
+- `greetings?: string[]` 欢迎语数组
+- `questions?: string[]` 预设问题数组
+- `botName?: string` 机器人名称（显示在组件顶部）
+
+## 前后端交互（SSE）
+
+- 请求：`POST` `application/json`
+```json
+{
+  "chatId": "<会话ID>",
+  "message": "<用户输入>"
+}
+```
+
+- 响应：`text/event-stream`，支持以下事件（逐行输出）：
+  - `event: message` + 多个 `data:`：流式文本
+  - `event: end` + 单个 `data:<chatId>`：返回会话 ID（用于续会话）
+  - `event: error` + 多个 `data:`：错误信息
+
+示例：
+```
+event: message
+data: Hello 
+data: world!
+
+event: end
+data: 123e4567-e89b-12d3-a456-426614174000
+```
+
+错误示例：
+```
+event: error
+data: 接口不存在: /h5/chat/stream
+```
+
+说明：若后端返回非 2xx 状态（例如 404），前端会读取返回的 JSON/文本中的 `message` 并提示。
+
+## 对话与历史存储
+
+- 会话 ID：保存在 `sessionStorage`（键名：`SESSION_ID`）
+- 聊天记录：保存在 `localStorage`（键名：`HISTORY`）
+- 上次对话时间：保存在 `localStorage`（键名：`LAST_CONVERSATION_TIME`）
+
+清理策略：
+- 历史超限会自动裁剪，仅保留最新若干条（避免体积过大）
+- 距离上次对话时间过长会自动清空历史（避免过期记录）
+
+## 错误处理
+
+- 网络错误：提示“Failed to connect to the server.”
+- 非 2xx：按 `Content-Type` 解读 JSON 或文本中的 `message` 并提示
+- 非 SSE 返回：作为非流式错误直接提示
+- 流式错误：识别 `event:error` 并以错误样式显示
+
+## 样式说明
+
+- 组件内部提供基础标签样式（参照 Chrome UA），减少宿主项目的全局重置对布局的影响
+- 样式随 JS 注入（无需单独引入 CSS）；如需独立 CSS，可调整构建配置后使用 `dist/style.css`
+- 可在宿主页面覆盖 `.bot-containner`、`.message-*` 等类以定制主题
 
 ## 许可证
-MIT
 
-## 备注
-- 打包配置：已启用 Vite 库模式（ESM + UMD），并将 `vue` 设为外部依赖（peerDependencies）。
-- 若要生成类型声明，后续可加入 `vite-plugin-dts` 或使用 `vue-tsc` 的声明输出。当前版本不包含 `.d.ts`。
+MIT
