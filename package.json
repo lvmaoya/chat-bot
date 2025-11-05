@@ -1,6 +1,6 @@
 {
   "name": "@lvmaoya/chat-bot",
-  "version": "0.2.6",
+  "version": "0.2.9",
   "private": false,
   "type": "module",
   "scripts": {

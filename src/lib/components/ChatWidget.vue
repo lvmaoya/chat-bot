@@ -229,7 +229,7 @@ const autoResize = (e: any) => {
                   v-for="item in props.questions"
                   @click="onPromptClick(item)"
                 >
-                  <p>{{ item }}</p>
+                  <p style="cursor: pointer;">{{ item }}</p>
                 </li>
               </ul>
             </div>
