@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeMount, ref, watch } from "vue";
-import { refreshIcon, closeIcon } from "../icons/svgIcons";
+import { refreshIcon, closeIcon } from "../assets/icons/svgIcons";
 import { handlePostRequestWithEventStream, ReceiveState } from "../api";
 import { formatLocalTime } from "../utils";
 import Loading from "./Loading.vue";
@@ -229,7 +229,7 @@ const autoResize = (e: any) => {
                   v-for="item in props.questions"
                   @click="onPromptClick(item)"
                 >
-                  <a href="javascript:;">{{ item }}</a>
+                  <p>{{ item }}</p>
                 </li>
               </ul>
             </div>
@@ -298,7 +298,7 @@ const autoResize = (e: any) => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .bot-trigger {
   &.hidden {
     display: none !important;
@@ -344,16 +344,65 @@ const autoResize = (e: any) => {
   flex-direction: column;
   box-sizing: border-box;
   background-color: white;
+
+  // 基于 Chrome UA 默认样式的局部基础标签规则
   a {
     color: #333;
-    text-decoration: none;
+    text-decoration: underline;
     outline: none;
   }
   img {
     border: 0;
   }
-  // 基于 Chrome UA 默认样式的局部基础标签规则
-
+  p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    unicode-bidi: isolate;
+    line-height: 1.9;
+  }
+  ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    padding-inline-start: 40px;
+    unicode-bidi: isolate;
+  }
+  pre {
+    background-color: #333;
+    padding: 12px;
+    border-radius: 8px;
+    max-width: 350px;
+    overflow-x: auto;
+    &::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 4px;
+      height: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 0;
+    }
+    &::-webkit-scrollbar-thumb {
+      cursor: pointer;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.1);
+      transition: color 0.2s ease;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    code {
+      background-color: transparent;
+      padding: 0;
+      font-size: 12px;
+      line-height: 22px;
+      color: #fff;
+    }
+  }
   .bot-header {
     height: 70px;
     display: flex;
@@ -365,6 +414,7 @@ const autoResize = (e: any) => {
       line-height: 0;
       display: flex;
       align-items: center;
+      user-select: none;
       span {
         font-weight: 600;
       }
@@ -417,19 +467,11 @@ const autoResize = (e: any) => {
         display: flex;
         gap: 10px;
       }
-      &.message-question {
-        .content li {
-          line-height: 2 !important;
-          list-style: disc;
-          color: #333;
-        }
-      }
       .content {
         width: fit-content;
         background-color: #f4f4f4;
         padding: 0 14px;
         font-size: 14px;
-        line-height: 22px;
       }
     }
 
@@ -460,7 +502,7 @@ const autoResize = (e: any) => {
       .content {
         border-radius: 0.5rem 0 0.5rem 0.5rem;
         background-color: #ffa305;
-        :deep(p) {
+        p {
           color: white;
         }
       }
@@ -574,37 +616,5 @@ const autoResize = (e: any) => {
   bottom: 0;
   width: 100%;
   border-radius: 16px 16px 0 0;
-}
-:deep(pre) {
-  background-color: #333;
-  padding: 12px;
-  border-radius: 8px;
-  max-width: 350px;
-  overflow-x: auto;
-  &::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 4px;
-    height: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 0;
-  }
-  &::-webkit-scrollbar-thumb {
-    cursor: pointer;
-    border-radius: 5px;
-    background: rgba(0, 0, 0, 0.1);
-    transition: color 0.2s ease;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
-  code {
-    background-color: transparent;
-    padding: 0;
-    font-size: 12px;
-    line-height: 22px;
-    color: #fff;
-  }
 }
 </style>
