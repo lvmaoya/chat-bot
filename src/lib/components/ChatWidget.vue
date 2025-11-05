@@ -282,8 +282,8 @@ const autoResize = (e: any) => {
           }"
         >
           <svg
-            width="20"
-            height="20"
+            width="17"
+            height="17"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
             class="icon"
@@ -541,10 +541,10 @@ const autoResize = (e: any) => {
     padding: 8px 0;
     textarea {
       flex: 1;
-      min-height: 60px;
+      min-height: 44px;
       border: none;
       margin-left: 12px;
-      padding: 20px 0;
+      padding: 12px 0;
       outline: 0;
       background-color: transparent;
       font-size: 14px;
@@ -553,6 +553,7 @@ const autoResize = (e: any) => {
       box-sizing: border-box;
       &::placeholder {
         color: #999;
+        font-size: 13px;
       }
       &:focus {
         border: none;
