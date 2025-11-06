@@ -77,6 +77,78 @@ import { ChatWidget } from '@lvmaoya/chat-bot';
 
 说明：Standalone 版本将 Vue 一并打包，体积更大但集成更简单；标准 UMD 版本需页面提前加载 Vue，体积更小。
 
+## Nuxt 3 集成
+
+- 安装依赖：
+  - `npm i @lvmaoya/chat-bot`
+
+- 客户端插件注册：
+  - 新建 `plugins/chatbot.client.ts`
+  - ```ts
+    // plugins/chatbot.client.ts
+    import { defineNuxtPlugin } from '#app'
+    import ChatBot from '@lvmaoya/chat-bot'
+
+    export default defineNuxtPlugin((nuxtApp) => {
+      nuxtApp.vueApp.use(ChatBot) // 注册 <ChatWidget>
+    })
+    ```
+  - 说明：`.client.ts` 仅在客户端执行，避免 SSR 期间访问 `localStorage/sessionStorage` 报错。
+
+- 页面中使用：
+  - ```vue
+    <template>
+      <ClientOnly>
+        <ChatWidget
+          endpointUrl="https://your-api/chat/stream"
+          botName="Lvmaoya"
+          :greetings="['Hello! How can I help you?']"
+          :questions="['Tell me a joke', 'Introduce yourself']"
+          placeholder="Please enter your questions"
+        />
+      </ClientOnly>
+    </template>
+    ```
+  - 说明：`ClientOnly` 可选，但推荐用于避免 SSR 与水合差异。
+
+- 运行时配置（可选）：
+  - 在 `nuxt.config.ts` 配置 `runtimeConfig.public`：
+    ```ts
+    // nuxt.config.ts
+    export default defineNuxtConfig({
+      runtimeConfig: {
+        public: {
+          chatEndpoint: 'https://your-api/chat/stream'
+        }
+      }
+    })
+    ```
+  - 页面读取并传入：
+    ```vue
+    <script setup lang="ts">
+    const { public: { chatEndpoint } } = useRuntimeConfig()
+    </script>
+
+    <template>
+      <ClientOnly>
+        <ChatWidget :endpointUrl="chatEndpoint" botName="Lvmaoya" />
+      </ClientOnly>
+    </template>
+    ```
+
+- 按需导入（不注册插件）：
+  - ```vue
+    <script setup lang="ts">
+    import { ChatWidget } from '@lvmaoya/chat-bot'
+    </script>
+
+    <template>
+      <ClientOnly>
+        <ChatWidget endpointUrl="https://your-api/chat/stream" />
+      </ClientOnly>
+    </template>
+    ```
+
 ## 可选属性
 
 - `endpointUrl?: string` 后端流式接口地址
