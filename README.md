@@ -83,6 +83,7 @@ import { ChatWidget } from '@lvmaoya/chat-bot';
 - `greetings?: string[]` 欢迎语数组
 - `questions?: string[]` 预设问题数组
 - `botName?: string` 机器人名称（显示在组件顶部）
+ - `placeholder?: string` 输入框占位文案（默认：`Please enter your questions`）
 
 ## 前后端交互（SSE）
 

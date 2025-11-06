@@ -27,6 +27,10 @@ const props = defineProps({
     type: String,
     default: "Lvmaoya",
   },
+  placeholder: {
+    type: String,
+    default: "Please enter your questions",
+  },
   greetings: {
     type: Array,
     default: () => [
@@ -272,7 +276,7 @@ const autoResize = (e: any) => {
           rows="1"
           v-model="inputValue"
           @keydown.enter.exact.prevent="handleSubmit"
-          placeholder="Please enter your questions"
+          :placeholder="props.placeholder"
           @input="autoResize"
         />
         <button
@@ -543,7 +547,7 @@ const autoResize = (e: any) => {
       flex: 1;
       min-height: 44px;
       border: none;
-      margin-left: 12px;
+      margin-left: 20px;
       padding: 12px 0;
       outline: 0;
       background-color: transparent;
