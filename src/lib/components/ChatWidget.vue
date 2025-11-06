@@ -311,7 +311,7 @@ const autoResize = (e: any) => {
   width: 50px;
   height: 40px;
   border-radius: 4px;
-  background-color: #000000f2;
+  background-color: #333;
   bottom: 40px;
   right: 40px;
   transition: 0.3s;
@@ -420,7 +420,7 @@ const autoResize = (e: any) => {
       align-items: center;
       user-select: none;
       span {
-        font-weight: 600;
+        font-weight: 500;
       }
     }
 
