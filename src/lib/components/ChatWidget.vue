@@ -50,6 +50,19 @@ const onBubbleClick = () => {
 
 const inputValue = ref("");
 const isLoading = ref(false);
+// 处理输入法（中文等）组合状态，避免按 Enter 时误发送
+const isComposing = ref(false);
+const onCompositionStart = () => {
+  isComposing.value = true;
+};
+const onCompositionEnd = () => {
+  isComposing.value = false;
+};
+const onEnterKey = (e: KeyboardEvent) => {
+  // 部分浏览器在组合期间 Enter 会带 isComposing 标记；双保险：也检查本地组合状态
+  if ((e as any).isComposing || isComposing.value) return;
+  handleSubmit();
+};
 
 const receiver = (state: ReceiveState, value: any) => {
   console.log(state, value);
@@ -275,9 +288,11 @@ const autoResize = (e: any) => {
         <textarea
           rows="1"
           v-model="inputValue"
-          @keydown.enter.exact.prevent="handleSubmit"
+          @keydown.enter.exact.prevent="onEnterKey"
           :placeholder="props.placeholder"
           @input="autoResize"
+          @compositionstart="onCompositionStart"
+          @compositionend="onCompositionEnd"
         />
         <button
           @click="handleSubmit"
